@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Wyników Strzeleckich</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #2c3e50;
+            --bg-color: #e6f2ff;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            background-image: linear-gradient(to bottom right, #d6e9ff, #e6f2ff);
+            min-height: 100vh;
+        }
+        
+        .wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px 0;
+            position: relative;
+        }
+        
+        h1 {
+            color: var(--accent-color);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        h1 i {
+            margin-right: 12px;
+            color: var(--primary-color);
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 8px;
+            margin-top: 30px;
+            display: flex;
+            align-items: center;
+        }
+        
+        h2 i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        h3 {
+            font-size: 1.3rem;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        h3 i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .container {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group:hover {
+            transform: translateY(-2px);
+        }
+        
+        .form-group label {
+            flex: 1;
+            font-weight: 600;
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-group label i {
+            margin-right: 8px;
+            color: var(--primary-color);
+            width: 20px;
+            text-align: center;
+        }
+        
+        .form-group input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+            outline: none;
+        }
+        
+        .form-group input[readonly] {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        .dotted-line {
+            flex: 2;
+            border-bottom: 2px dotted #aaa;
+            margin: 0 15px;
+            opacity: 0.6;
+        }
+        
+        .results {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e1e1e1;
+            background-color: rgba(52, 152, 219, 0.05);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .details {
+            margin-top: 30px;
+            padding: 25px;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            border-left: 5px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+        
+        select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 15px;
+            background-color: white;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23333'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+        
+        select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+            outline: none;
+        }
+        
+        select[multiple] {
+            height: auto;
+            min-height: 150px;
+            background-image: none;
+        }
+        
+        .exercise-details {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border-left: 3px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        
+        thead {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e1e1;
+        }
+        
+        tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        tbody tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        tfoot {
+            font-weight: bold;
+            background-color: #f8f9fa;
+        }
+        
+        .info-box {
+            background-color: #f8f9fa;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box ul {
+            padding-left: 20px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <h1><i class="fas fa-bullseye"></i>Kalkulator Wyników Strzeleckich</h1>
+        </header>
+        
+        <div class="container">
+            <h2><i class="fas fa-clipboard-list"></i>Zestawienie wyników:</h2>
+            
+            <div class="form-group">
+                <label for="total"><i class="fas fa-users"></i>Strzelało</label>
+                <div class="dotted-line"></div>
+                <input type="number" id="total" min="0" value="0">
+            </div>
+            
+            <div class="form-group">
+                <label for="very_good"><i class="fas fa-medal"></i>Bardzo dobrych</label>
+                <div class="dotted-line"></div>
+                <input type="number" id="very_good" min="0" value="0">
+            </div>
+            
+            <div class="form-group">
+                <label for="good"><i class="fas fa-thumbs-up"></i>Dobrych</label>
+                <div class="dotted-line"></div>
+                <input type="number" id="good" min="0" value="0">
+            </div>
+            
+            <div class="form-group">
+                <label for="satisfactory"><i class="fas fa-check"></i>Dostatecznych</label>
+                <div class="dotted-line"></div>
+                <input type="number" id="satisfactory" min="0" value="0">
+            </div>
+            
+            <div class="form-group">
+                <label for="unsatisfactory"><i class="fas fa-times"></i>Niedostatecznych</label>
+                <div class="dotted-line"></div>
+                <input type="number" id="unsatisfactory" min="0" value="0">
+            </div>
+            
+            <div class="results">
+                <div class="form-group">
+                    <label for="percentage"><i class="fas fa-percent"></i>Procent wykonania</label>
+                    <div class="dotted-line"></div>
+                    <input type="text" id="percentage" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="mean"><i class="fas fa-calculator"></i>Ocena średnia arytmetyczna</label>
+                    <div class="dotted-line"></div>
+                    <input type="text" id="mean" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="overall"><i class="fas fa-star"></i>Ocena ogólna</label>
+                    <div class="dotted-line"></div>
+                    <input type="text" id="overall" readonly>
+                </div>
+            </div>
+            
+            <button id="showDetails" class="btn"><i class="fas fa-chevron-down"></i>Pokaż szczegóły</button>
+            
+            <div id="details" class="details hidden">
+                <h3><i class="fas fa-info-circle"></i>Szczegółowe obliczenia</h3>
+                
+                <div id="calculationDetails" class="card">
+                    <p><strong>Sposób obliczeń:</strong></p>
+                    <ul>
+                        <li>Procent wykonania: (Liczba strzelających z wynikiem pozytywnym / Liczba wszystkich strzelających) × 100%</li>
+                        <li>Ocena średnia arytmetyczna: (5 × Liczba bardzo dobrych + 4 × Liczba dobrych + 3 × Liczba dostatecznych + 2 × Liczba niedostatecznych) / Liczba wszystkich strzelających</li>
+                        <li>Ocena ogólna:
+                            <ul>
+                                <li>"Bardzo dobra" - średnia arytmetyczna wynosi co najmniej 4,51</li>
+                                <li>"Dobra" - średnia arytmetyczna wynosi co najmniej 3,51</li>
+                                <li>"Dostateczna" - średnia arytmetyczna wynosi co najmniej 2,51</li>
+                                <li>"Niedostateczna" - średnia arytmetyczna poniżej 2,51</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                
+                <h3><i class="fas fa-boxes"></i>Zużycie amunicji</h3>
+                
+                <div class="card">
+                    <p><i class="fas fa-crosshairs"></i> Wybierz strzelania i ćwiczenia:</p>
+                    <select id="shootingExercise" multiple size="6">
+                        <option value="1">Strzelanie szkolne Nr 1 – strzelanie na celność i skupienie (5 szt)</option>
+                        <option value="2">Strzelanie szkolne Nr 2 - strzelanie w postawie leżącej (15 szt)</option>
+                        <option value="3">Strzelanie szkolne Nr 1 z karabinka–granatnika wz. 1974/ 5,56 mm kbs wz. 96 (4 szt. NGO (NGC)-74)</option>
+                        <option value="4">Ćwiczenie przygotowawcze z karabinka do pełnienia służby wartowniczej (6 szt)</option>
+                        <option value="5">Ćwiczenie przygotowawcze z karabinka Mini Beryl do pełnienia służby wartowniczej (6 szt)</option>
+                        <option value="6">Ćwiczenie przygotowawcze z karabinka Mini Beryl do pełnienia służby wartowniczej (12 szt - pistolety)</option>
+                        <option value="7">Ćwiczenie przygotowawcze z pistoletu maszynowego do pełnienia służby wartowniczej (5 szt)</option>
+                    </select>
+                    <button id="calculateAmmo" class="btn"><i class="fas fa-calculator"></i>Oblicz zużycie amunicji</button>
+                    
+                    <div id="ammoCalculation" class="hidden">
+                        <table id="ammoTable">
+                            <thead>
+                                <tr>
+                                    <th>Ćwiczenie</th>
+                                    <th>Liczba nabojów na osobę</th>
+                                    <th>Liczba strzelających</th>
+                                    <th>Razem nabojów</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- JS will fill this -->
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="3">Łącznie zużycie amunicji:</th>
+                                    <td id="totalAmmo">0</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                
+                <h3><i class="fas fa-clipboard-check"></i>Warunki strzelania</h3>
+                <select id="shootingConditions">
+                    <option value="">Wybierz ćwiczenie, aby zobaczyć warunki strzelania</option>
+                    <option value="1">Strzelanie szkolne Nr 1 – strzelanie na celność i skupienie</option>
+                    <option value="2">Strzelanie szkolne Nr 2 - strzelanie w postawie leżącej</option>
+                    <option value="3">Strzelanie szkolne Nr 1 z karabinka–granatnika wz. 1974/ 5,56 mm kbs wz. 96</option>
+                    <option value="4">Ćwiczenie przygotowawcze z karabinka do pełnienia służby wartowniczej</option>
+                    <option value="5">Ćwiczenie przygotowawcze z karabinka Mini Beryl do pełnienia służby wartowniczej</option>
+                    <option value="7">Ćwiczenie przygotowawcze z pistoletu maszynowego do pełnienia służby wartowniczej</option>
+                </select>
+                
+                <div id="conditionsDetails" class="exercise-details hidden">
+                    <!-- JS will fill this -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Elements
+        const totalInput = document.getElementById('total');
+        const veryGoodInput = document.getElementById('very_good');
+        const goodInput = document.getElementById('good');
+        const satisfactoryInput = document.getElementById('satisfactory');
+        const unsatisfactoryInput = document.getElementById('unsatisfactory');
+        const percentageOutput = document.getElementById('percentage');
+        const meanOutput = document.getElementById('mean');
+        const overallOutput = document.getElementById('overall');
+        const showDetailsBtn = document.getElementById('showDetails');
+        const detailsDiv = document.getElementById('details');
+        const calculateAmmoBtn = document.getElementById('calculateAmmo');
+        const ammoCalculationDiv = document.getElementById('ammoCalculation');
+        const ammoTableBody = document.getElementById('ammoTable').querySelector('tbody');
+        const totalAmmoOutput = document.getElementById('totalAmmo');
+        const shootingConditionsSelect = document.getElementById('shootingConditions');
+        const conditionsDetailsDiv = document.getElementById('conditionsDetails');
+        
+        // Exercise data
+        const exercises = {
+            1: {
+                name: "Strzelanie szkolne Nr 1 – strzelanie na celność i skupienie",
+                ammo: 5,
+                details: `
+                    <h4><i class="fas fa-bullseye"></i> Strzelanie szkolne Nr 1 – strzelanie na celność i skupienie</h4>
+                    <p><strong><i class="fas fa-crosshairs"></i> Cel:</strong> popiersie (figura bojowa nr 23p) na tarczy o wymiarach 0,75x0,75 m, cel stały.</p>
+                    <p><strong><i class="fas fa-ruler-horizontal"></i> Odległość:</strong> 100 m.</p>
+                    <p><strong><i class="fas fa-box"></i> Liczba nabojów:</strong> 5 szt.</p>
+                    <p><strong><i class="fas fa-clock"></i> Czas:</strong> nieograniczony</p>
+                    <p><strong><i class="fas fa-user"></i> Postawa:</strong> leżąca z wykorzystaniem podpórki.</p>
+                    <p><strong><i class="fas fa-fire"></i> Rodzaj ognia:</strong> pojedynczy.</p>
+                    <p><strong><i class="fas fa-star"></i> Ocena:</strong></p>
+                    <ul>
+                        <li>„bardzo dobrze" – uzyskać 40 punktów;</li>
+                        <li>„dobrze" – uzyskać 35 punktów;</li>
+                        <li>„dostatecznie" – uzyskać 30 punktów.</li>
+                    </ul>
+                    <p><strong><i class="fas fa-sun"></i> Warunki strzelania:</strong> dzień.</p>
+                    <p><strong><i class="fas fa-info-circle"></i> Wskazówki:</strong> na komendę kierownika strzelania „Naprzód" strzelający zajmuje stanowisko ogniowe na LOO, przyjmuje postawę strzelecką, wprowadza nabój do komory nabojowej, zabezpiecza broń i melduje gotowość do strzelania przez podniesienie wolnej ręki. Kierownik strzelania podaje następujące komendy: do rozpoczęcia strzelania „Do popiersia ognia", a po zakończeniu strzelania „Przerwij ogień".</p>
+                `
+            },
+            2: {
+                name: "Strzelanie szkolne Nr 2 - strzelanie w postawie leżącej",
+                ammo: 15,
+                details: `
+                    <h4><i class="fas fa-bullseye"></i> Strzelanie szkolne Nr 2 - strzelanie w postawie leżącej</h4>
+                    <p><strong><i class="fas fa-crosshairs"></i> Cele:</strong> karabin maszynowy (figura bojowa nr 27), cel ukazuje się 5 razy na 30 sekund z przerwami 10 sekundowymi.</p>
+                    <p><strong><i class="fas fa-ruler-horizontal"></i> Odległość:</strong> 100 m.</p>
+                    <p><strong><i class="fas fa-box"></i> Liczba nabojów:</strong> 15 szt.</p>
+                    <p><strong><i class="fas fa-clock"></i> Czas:</strong> ograniczony ukazywaniem się celów.</p>
+                    <p><strong><i class="fas fa-user"></i> Postawa:</strong> leżąca z podpórką.</p>
+                    <p><strong><i class="fas fa-fire"></i> Rodzaj ognia:</strong> krótkie serie.</p>
+                    <p><strong><i class="fas fa-star"></i> Ocena:</strong></p>
+                    <ul>
+                        <li>„bardzo dobrze" – trafić cel 4 razy;</li>
+                        <li>„dobrze" – trafić cel 3 razy;</li>
+                        <li>„dostatecznie" – trafić cel 2 razy.</li>
+                    </ul>
+                    <p><strong><i class="fas fa-sun"></i> Warunki strzelania:</strong> dzień, noc, w masce.</p>
+                    <p><strong><i class="fas fa-info-circle"></i> Wskazówki:</strong> na komendę kierownika strzelania „Naprzód" strzelający zajmuje stanowisko ogniowe na LOO, przyjmuje postawą strzelecką i rozpoczyna strzelanie.</p>
+                `
+            },
+            3: {
+                name: "Strzelanie szkolne Nr 1 z karabinka–granatnika wz. 1974/ 5,56 mm kbs wz. 96",
+                ammo: 4,
+                details: `
+                    <h4><i class="fas fa-bullseye"></i> Strzelanie szkolne Nr 1 z karabinka–granatnika wz. 1974/ 5,56 mm kbs wz. 96 – strzelanie w postawie dowolnej</h4>
+                    <p><strong><i class="fas fa-crosshairs"></i> Cel:</strong> grupa piechoty: 3 x biegnący (3 x figura bojowa nr 40) rozmieszczone w środku pola prostokąta o szerokości 10 m i głębokości 20 m.</p>
+                    <p><strong><i class="fas fa-ruler-horizontal"></i> Odległość:</strong> 200 – 250 m.</p>
+                    <p><strong><i class="fas fa-box"></i> Liczba nabojów:</strong> 4 szt. NGO (NGC)-74/ granat nasadkowy do kbs wz 96.</p>
+                    <p><strong><i class="fas fa-clock"></i> Czas:</strong> nieograniczony.</p>
+                    <p><strong><i class="fas fa-user"></i> Postawa:</strong> dowolna.</p>
+                    <p><strong><i class="fas fa-fire"></i> Rodzaj ognia:</strong> pojedynczy.</p>
+                    <p><strong><i class="fas fa-star"></i> Ocena:</strong></p>
+                    <ul>
+                        <li>„bardzo dobrze" – trafić w pole trzy razy;</li>
+                        <li>„dobrze" – trafić w pole dwa razy;</li>
+                        <li>„dostatecznie" – trafić w pole.</li>
+                    </ul>
+                    <p><strong><i class="fas fa-sun"></i> Warunki strzelania:</strong> dzień.</p>
+                    <p><strong><i class="fas fa-info-circle"></i> Wskazówki:</strong> na komendę kierownika strzelania „Naprzód" strzelający zajmuje stanowisko ogniowe na LOO, przyjmuje postawą strzelecką i przygotowuje się do strzelania. Po wykryciu celu strzelający samodzielnie prowadzi ogień.</p>
+                `
+            },
+            4: {
+                name: "Ćwiczenie przygotowawcze z karabinka do pełnienia służby wartowniczej",
+                ammo: 6,
+                details: `
+                    <h4><i class="fas fa-bullseye"></i> Ćwiczenie przygotowawcze z karabinka do pełnienia służby wartowniczej</h4>
+                    <p><strong><i class="fas fa-crosshairs"></i> Cele:</strong></p>
+                    <ul>
+                        <li>nr 1 – 2 x figura bojowa nr 40 (biegnący) ukazuje i ukrywa się na komendę kierownika strzelania;</li>
+                        <li>nr 2 – figura bojowa nr 23 (popiersie);</li>
+                        <li>nr 3 – figura bojowa nr 30 (klęczący);</li>
+                        <li>Cele nr 2 i 3 ukazują się jednocześnie na 25 sekund po 10 sekundach od ukrycia się celu nr 1.</li>
+                    </ul>
+                    <p><strong><i class="fas fa-ruler-horizontal"></i> Odległość:</strong></p>
+                    <ul>
+                        <li>do celu nr 1 – 150 m; (Do celu nr 1 nie prowadzi się ognia)</li>
+                        <li>do celu nr 2 – 75 m;</li>
+                        <li>do celu nr 3 – 100 m.</li>
+                    </ul>
+                    <p><strong><i class="fas fa-box"></i> Liczba nabojów:</strong> 6 szt.</p>
+                    <p><strong><i class="fas fa-clock"></i> Czas:</strong> ograniczony ukazywaniem się celów.</p>
+                    <p><strong><i class="fas fa-user"></i> Postawa:</strong></p>
+                    <ul>
+                        <li>do celu nr 1 – stojąca;</li>
+                        <li>do celu nr 2 i 3 – klęcząca za ukryciem.</li>
+                    </ul>
+                    <p><strong><i class="fas fa-fire"></i> Rodzaj ognia:</strong> ogień pojedynczy.</p>
+                    <p><strong><i class="fas fa-star"></i> Ocena:</strong></p>
+                    <ul>
+                        <li>„bardzo dobrze" – trafić dwa cele;</li>
+                        <li>„dobrze" – trafić cel nr 2;</li>
+                        <li>„dostatecznie" – trafić cel nr 3.</li>
+                    </ul>
+                    <p><strong><i class="fas fa-sun"></i> Warunki strzelania:</strong> dzień, noc.</p>
+                `
+            },
+            5: {
+                name: "Ćwiczenie przygotowawcze z karabinka Mini Beryl do pełnienia służby wartowniczej",
+                ammo: 6,
+                details: `
+                    <h4><i class="fas fa-bullseye"></i> Ćwiczenie przygotowawcze z karabinka Mini Beryl do pełnienia służby wartowniczej</h4>
+                    <p><strong><i class="fas fa-crosshairs"></i> Cele:</strong></p>
+                    <ul>
+                        <li>nr 1 – 2 x figura bojowa nr 40 (biegnący) ukazuje i ukrywa się na komendę kierownika strzelania; (Do celu nr 1 nie prowadzi się ognia)</li>
+                        <li>nr 2 – figura bojowa nr 23 (popiersie);</li>
+                        <li>nr 3 – figura bojowa nr 30 (klęczący);</li>
+                        <li>Cele nr 2 i 3 ukazują się jednocześnie na 25 sekund po 10 sekundach od ukrycia się celu nr 1.</li>
+                    </ul>
+                    <p><strong><i class="fas fa-ruler-horizontal"></i> Odległość:</strong></p>
+                    <ul>
+                        <li>do celu nr 1 – 150 m;</li>
+                        <li>do celu nr 2 – 50 m;</li>
+                        <li>do celu nr 3 – 75 m.</li>
+                    </ul>
+                    <p><strong><i class="fas fa-box"></i> Liczba nabojów:</strong> 6 szt. (w pistoletach, które nie mają przełącznika rodzaju ognia 12 szt.).</p>
+                    <p><strong><i class="fas fa-clock"></i> Czas:</strong> ograniczony ukazywaniem się celów.</p>
+                    <p><strong><i class="fas fa-user"></i> Postawa:</strong></p>
+                    <ul>
+                        <li>do celu nr 1 – stojąca;</li>
+                        <li>do celu nr 2 i 3 – klęcząca za ukryciem.</li>
+                    </ul>
+                    <p><strong><i class="fas fa-fire"></i> Rodzaj ognia:</strong> ogień pojedynczy (w pistoletach, które nie mają przełącznika rodzaju ognia krótkimi seriami).</p>
+                    <p><strong><i class="fas fa-star"></i> Ocena:</strong></p>
+                    <ul>
+                        <li>„bardzo dobrze" – trafić dwa cele;</li>
+                        <li>„dobrze" – trafić cel nr 2;</li>
+                        <li>„dostatecznie" – trafić cel nr 3.</li>
+                    </ul>
+                    <p><strong><i class="fas fa-sun"></i> Warunki strzelania:</strong> dzień, noc.</p>
+                `
+            },
+            6: {
+                name: "Ćwiczenie przygotowawcze z karabinka Mini Beryl (pistolet)",
+                ammo: 12
+            },
+            7: {
+                name: "Ćwiczenie przygotowawcze z pistoletu maszynowego do pełnienia służby wartowniczej",
+                ammo: 5,
+                details: `
+                    <h4><i class="fas fa-bullseye"></i> Ćwiczenie przygotowawcze z pistoletu maszynowego do pełnienia służby wartowniczej</h4>
+                    <p><strong><i class="fas fa-crosshairs"></i> Cele:</strong></p>
+                    <ul>
+                        <li>nr 1 – figura bojowa nr TS-10 ukazuje się dwa razy; pierwsze ukazanie – na 20 sekund; drugie ukazanie na 10 sekund, bezpośrednio po trafieniu lub ukryciu się celu nr 2;</li>
+                        <li>nr 2 – figura bojowa TS-10, ukazuje się na 10 sekund, po 5 sekundach od trafienia lub ukryciu się celu nr 1 po jego pierwszym ukazaniu;</li>
+                        <li>nr 3 – figura bojowa nr TS-10, ukazuje się na 10 sekund, cel ukazuje się bezpośrednio po trafieniu lub ukryciu się celu nr 1 po jego drugim ukazaniu.</li>
+                    </ul>
+                    <p><strong><i class="fas fa-ruler-horizontal"></i> Odległość:</strong></p>
+                    <ul>
+                        <li>do celu nr 1 i 2 – 40-50 m;</li>
+                        <li>do celu nr 3 – 20-25 m.</li>
+                    </ul>
+                    <p><strong><i class="fas fa-box"></i> Liczba nabojów:</strong> 5 szt.</p>
+                    <p><strong><i class="fas fa-clock"></i> Czas:</strong> ograniczony ukazywaniem się celów.</p>
+                    <p><strong><i class="fas fa-user"></i> Postawa:</strong> dowolna (według decyzji strzelającego).</p>
+                    <p><strong><i class="fas fa-fire"></i> Rodzaj ognia:</strong> ogień pojedynczy.</p>
+                    <p><strong><i class="fas fa-star"></i> Ocena:</strong></p>
+                    <ul>
+                        <li>„bardzo dobrze" – trafić trzy cele;</li>
+                        <li>„dobrze" – trafić dwa cele;</li>
+                        <li>„dostatecznie" – trafić jeden cel.</li>
+                    </ul>
+                    <p><strong><i class="fas fa-sun"></i> Warunki strzelania:</strong> dzień.</p>
+                `
+            }
+        };
+        
+        // Calculate results function
+        function calculateResults() {
+            const total = parseInt(totalInput.value) || 0;
+            const veryGood = parseInt(veryGoodInput.value) || 0;
+            const good = parseInt(goodInput.value) || 0;
+            const satisfactory = parseInt(satisfactoryInput.value) || 0;
+            const unsatisfactory = parseInt(unsatisfactoryInput.value) || 0;
+            
+            // Validate inputs
+            if (veryGood + good + satisfactory + unsatisfactory > total) {
+                alert("Suma poszczególnych ocen nie może przekraczać łącznej liczby strzelających!");
+                return;
+            }
+            
+            // Calculate percentage of completion
+            const positiveResults = veryGood + good + satisfactory;
+            const percentage = total > 0 ? (positiveResults / total * 100) : 0;
+            percentageOutput.value = percentage.toFixed(2) + "%";
+            
+            // Calculate arithmetic mean
+            const sum = 5 * veryGood + 4 * good + 3 * satisfactory + 2 * unsatisfactory;
+            const mean = total > 0 ? (sum / total) : 0;
+            meanOutput.value = mean.toFixed(2);
+            
+            // Determine overall assessment
+            let overall = "Niedostateczna";
+            if (mean >= 4.51) {
+                overall = "Bardzo dobra";
+            } else if (mean >= 3.51) {
+                overall = "Dobra";
+            } else if (mean >= 2.51) {
+                overall = "Dostateczna";
+            }
+            overallOutput.value = overall;
+        }
+        
+        // Calculate ammunition usage
+        function calculateAmmoUsage() {
+            const total = parseInt(totalInput.value) || 0;
+            if (total === 0) {
+                alert("Proszę wprowadzić liczbę strzelających!");
+                return;
+            }
+            
+            const selectedExercises = Array.from(document.getElementById('shootingExercise').selectedOptions)
+                .map(option => parseInt(option.value));
+            
+            if (selectedExercises.length === 0) {
+                alert("Proszę wybrać co najmniej jedno ćwiczenie!");
+                return;
+            }
+            
+            // Clear previous data
+            ammoTableBody.innerHTML = '';
+            let totalAmmo = 0;
+            
+            // Calculate for each selected exercise
+            selectedExercises.forEach(exerciseId => {
+                const exercise = exercises[exerciseId];
+                const exerciseAmmo = exercise.ammo * total;
+                totalAmmo += exerciseAmmo;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${exercise.name}</td>
+                    <td>${exercise.ammo}</td>
+                    <td>${total}</td>
+                    <td>${exerciseAmmo}</td>
+                `;
+                ammoTableBody.appendChild(row);
+            });
+            
+            totalAmmoOutput.textContent = totalAmmo;
+            ammoCalculationDiv.classList.remove('hidden');
+        }
+        
+        // Show exercise details
+        function showExerciseDetails() {
+            const exerciseId = parseInt(shootingConditionsSelect.value);
+            if (exerciseId && exercises[exerciseId] && exercises[exerciseId].details) {
+                conditionsDetailsDiv.innerHTML = exercises[exerciseId].details;
+                conditionsDetailsDiv.classList.remove('hidden');
+            } else {
+                conditionsDetailsDiv.classList.add('hidden');
+            }
+        }
+        
+        // Event listeners
+        totalInput.addEventListener('input', calculateResults);
+        veryGoodInput.addEventListener('input', calculateResults);
+        goodInput.addEventListener('input', calculateResults);
+        satisfactoryInput.addEventListener('input', calculateResults);
+        unsatisfactoryInput.addEventListener('input', calculateResults);
+        
+        showDetailsBtn.addEventListener('click', function() {
+            if (detailsDiv.classList.contains('hidden')) {
+                detailsDiv.classList.remove('hidden');
+                showDetailsBtn.textContent = 'Ukryj szczegóły';
+                showDetailsBtn.innerHTML = '<i class="fas fa-chevron-up"></i>Ukryj szczegóły';
+            } else {
+                detailsDiv.classList.add('hidden');
+                showDetailsBtn.innerHTML = '<i class="fas fa-chevron-down"></i>Pokaż szczegóły';
+            }
+        });
+        
+        calculateAmmoBtn.addEventListener('click', calculateAmmoUsage);
+        shootingConditionsSelect.addEventListener('change', showExerciseDetails);
+        
+        // Initialize calculations
+        calculateResults();
+    </script>
+</body>
+</html>
