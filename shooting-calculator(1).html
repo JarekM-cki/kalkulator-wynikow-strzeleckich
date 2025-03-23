@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalkulator Wyników Strzeleckich</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --primary-color: #3498db;
@@ -188,6 +190,22 @@
             transform: translateY(0);
         }
         
+        .btn-red {
+            background-color: #e74c3c;
+        }
+        
+        .btn-red:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-green {
+            background-color: #27ae60;
+        }
+        
+        .btn-green:hover {
+            background-color: #219955;
+        }
+        
         .details {
             margin-top: 30px;
             padding: 25px;
@@ -294,6 +312,42 @@
             box-shadow: 0 6px 12px rgba(0,0,0,0.1);
             transform: translateY(-3px);
         }
+        
+        .detailed-specs {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f8ff;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .detailed-specs h4 {
+            color: #2c3e50;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e1e1e1;
+        }
+        
+        .detailed-specs h4:first-child {
+            margin-top: 0;
+        }
+        
+        .detailed-specs ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .detailed-specs li {
+            margin-bottom: 5px;
+            line-height: 1.6;
+        }
+        
+        .buttons-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -355,9 +409,15 @@
                 </div>
             </div>
             
-            <button id="showDetails" class="btn"><i class="fas fa-chevron-down"></i>Pokaż szczegóły</button>
+            <div class="buttons-container">
+                <button id="showDetails" class="btn"><i class="fas fa-chevron-down"></i>Pokaż szczegóły</button>
+                <button id="savePdf" class="btn btn-red"><i class="fas fa-file-pdf"></i>Zapisz do PDF</button>
+                <button id="techDetails" class="btn btn-green"><i class="fas fa-cogs"></i>Dane techniczno taktyczne</button>
+                <button id="sightingBtn" class="btn" style="background-color: #9b59b6;"><i class="fas fa-eye"></i>Zgrywanie przyrządów</button>
+            </div>
             
-            <div id="details" class="details hidden">
+            <!-- Szczegóły -->
+            <div id="detailsSection" class="details hidden">
                 <h3><i class="fas fa-info-circle"></i>Szczegółowe obliczenia</h3>
                 
                 <div id="calculationDetails" class="card">
@@ -429,308 +489,841 @@
                     <!-- JS will fill this -->
                 </div>
             </div>
+            
+            <!-- Dane techniczno taktyczne -->
+            <div id="technicalSection" class="details hidden">
+                <h3><i class="fas fa-cogs"></i>Dane techniczno taktyczne broni</h3>
+                
+                <div class="card">
+                    <h4><i class="fas fa-crosshairs"></i>Wybierz rodzaj broni</h4>
+                    <select id="weaponType">
+                        <option value="">-- Wybierz rodzaj broni --</option>
+                        <option value="kbk_akm">Karabinek AKM</option>
+                        <option value="kbk_beryl">Karabinek wz. 96 Beryl</option>
+                        <option value="kbk_mini_beryl">Karabinek Mini Beryl</option>
+                        <option value="pm_pm63">Pistolet maszynowy PM-63 RAK</option>
+                        <option value="pm_pm84">Pistolet maszynowy PM-84 Glauberyt</option>
+                        <option value="p_wist">Pistolet WIST-94</option>
+                    </select>
+                    
+                    <div id="weaponData" class="hidden">
+                        <!-- JS will fill this -->
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h4><i class="fas fa-bullseye"></i>Praktyczne wskazówki taktyczne</h4>
+                    <div class="info-box">
+                        <p><strong>Zasady bezpieczeństwa:</strong></p>
+                        <ul>
+                            <li>Zawsze traktuj broń jak załadowaną</li>
+                            <li>Nigdy nie kieruj lufy w stronę ludzi</li>
+                            <li>Trzymaj palec poza spustem aż do momentu oddania strzału</li>
+                            <li>Bądź pewien celu i tego co znajduje się za nim</li>
+                        </ul>
+                        
+                        <p><strong>Odległości efektywnego ognia:</strong></p>
+                        <ul>
+                            <li>Karabinki: do 400 m</li>
+                            <li>Pistolety maszynowe: do 150 m</li>
+                            <li>Pistolety: do 50 m</li>
+                        </ul>
+                        
+                        <p><strong>Czynniki wpływające na celność:</strong></p>
+                        <ul>
+                            <li>Stabilność postawy strzeleckiej</li>
+                            <li>Kontrola oddechu (zalecane wstrzymanie na 2-3 sekundy)</li>
+                            <li>Płynność ściągania spustu</li>
+                            <li>Warunki pogodowe (wiatr, opady)</li>
+                            <li>Zmęczenie strzelca</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Zgrywanie przyrządów celowniczych -->
+            <div id="sightingSection" class="details hidden">
+                <h3><i class="fas fa-eye"></i>Zgrywanie przyrządów celowniczych i techniki celowania</h3>
+                
+                <div class="card">
+                    <h4><i class="fas fa-wrench"></i>Zgrywanie przyrządów celowniczych</h4>
+                    
+                    <div class="info-box">
+                        <p><strong>Procedura zgrywania przyrządów mechanicznych:</strong></p>
+                        <ol>
+                            <li><strong>Przygotowanie broni:</strong> 
+                                <ul>
+                                    <li>Upewnij się, że broń jest rozładowana i zabezpieczona</li>
+                                    <li>Ustaw broń na stabilnej podstawie (worek z piaskiem, dwójnóg, specjalna podpórka)</li>
+                                </ul>
+                            </li>
+                            <li><strong>Wybór odległości:</strong> 
+                                <ul>
+                                    <li>Zgrywanie karabinków najlepiej wykonać na odległości 100 m</li>
+                                    <li>Dla pistoletu lub pistoletu maszynowego zalecana odległość to 25-50 m</li>
+                                </ul>
+                            </li>
+                            <li><strong>Wykonanie strzałów próbnych:</strong>
+                                <ul>
+                                    <li>Oddaj 3-5 strzałów, celując zawsze w ten sam punkt</li>
+                                    <li>Utrzymuj identyczną technikę celowania przy każdym strzale</li>
+                                </ul>
+                            </li>
+                            <li><strong>Pomiar odchylenia:</strong>
+                                <ul>
+                                    <li>Zmierz odległość środka skupienia strzałów od punktu celowania w pionie i poziomie</li>
+                                    <li>Zapamiętaj lub zapisz te wartości</li>
+                                </ul>
+                            </li>
+                            <li><strong>Regulacja przyrządów:</strong>
+                                <ul>
+                                    <li>Regulacja w pionie (podniesienie/obniżenie): 
+                                        <br>- Jeśli strzały są za nisko: podnieś muszkę lub obniż szczerbinkę
+                                        <br>- Jeśli strzały są za wysoko: obniż muszkę lub podnieś szczerbinkę</li>
+                                    <li>Regulacja w poziomie (lewo/prawo):
+                                        <br>- Jeśli strzały są za bardzo w lewo: przesuń muszkę w prawo lub szczerbinkę w lewo
+                                        <br>- Jeśli strzały są za bardzo w prawo: przesuń muszkę w lewo lub szczerbinkę w prawo</li>
+                                </ul>
+                            </li>
+                            <li><strong>Zasada przesuwania muszki:</strong> "Muszkę przesuwamy w stronę błędu"</li>
+                            <li><strong>Weryfikacja:</strong>
+                                <ul>
+                                    <li>Po każdej regulacji wykonaj ponownie 3-5 strzałów kontrolnych</li>
+                                    <li>Powtarzaj proces, aż środek skupienia strzałów będzie zgodny z punktem celowania</li>
+                                </ul>
+                            </li>
+                        </ol>
+                        
+                        <div style="text-align: center; margin: 20px 0;">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8IS0tIFRhcmN6YSAtLT4KICA8Y2lyY2xlIGN4PSIyMDAiIGN5PSIxNTAiIHI9IjEwMCIgZmlsbD0id2hpdGUiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIvPgogIDxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iODAiIGZpbGw9IndoaXRlIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8Y2lyY2xlIGN4PSIyMDAiIGN5PSIxNTAiIHI9IjYwIiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPGNpcmNsZSBjeD0iMjAwIiBjeT0iMTUwIiByPSI0MCIgZmlsbD0id2hpdGUiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIvPgogIDxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iMjAiIGZpbGw9ImJsYWNrIi8+CiAgCiAgPCEtLSBQcnp5a8WCYWRvd2UgdHJhZmllbmlhIC0tPgogIDxjaXJjbGUgY3g9IjI0MCIgY3k9IjEyMCIgcj0iNSIgZmlsbD0icmVkIi8+CiAgPGNpcmNsZSBjeD0iMjMwIiBjeT0iMTMwIiByPSI1IiBmaWxsPSJyZWQiLz4KICA8Y2lyY2xlIGN4PSIyMzUiIGN5PSIxMTAiIHI9IjUiIGZpbGw9InJlZCIvPgogIDxjaXJjbGUgY3g9IjI0NSIgY3k9IjEyNSIgcj0iNSIgZmlsbD0icmVkIi8+CiAgCiAgPCEtLSBTdHJ6YcWCa2kgcG9rYXp1asSFY2UgcmVndWxhY2rEmSAtLT4KICA8bGluZSB4MT0iMjAwIiB5MT0iMTUwIiB4Mj0iMjM4IiB5Mj0iMTIxIiBzdHJva2U9ImJsdWUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNSw1Ii8+CiAgPHBvbHlnb24gcG9pbnRzPSIyNTAsOTAgMjQwLDExMCAyNjAsMTEwIiBmaWxsPSJibHVlIi8+CiAgPHRleHQgeD0iMjUwIiB5PSI4MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5QcnplbWllxZtEIE11c3prxJk8L3RleHQ+CiAgPHRleHQgeD0iMjUwIiB5PSI2MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj53IExld28gaSBExsNsPC90ZXh0PgogIAogIDxsaW5lIHgxPSIyMzgiIHkxPSIxMjEiIHgyPSIyMDAiIHkyPSI2MCIgc3Ryb2tlPSJncmVlbiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI1LDUiLz4KICA8cG9seWdvbiBwb2ludHM9IjIwMCw0MCAxOTAsNjAgMjEwLDYwIiBmaWxsPSJncmVlbiIvPgogIDx0ZXh0IHg9IjIwMCIgeT0iMzAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+UmVndWxhY2phIFBpb25vd2E8L3RleHQ+Cjwvc3ZnPg==" alt="Schemat zgrywania przyrządów celowniczych" style="max-width: 100%;">
+                        </div>
+                        
+                        <p><strong>Uwagi:</strong></p>
+                        <ul>
+                            <li>Zgrywanie przyrządów powinno być wykonane przy dobrym oświetleniu</li>
+                            <li>Unikaj zgrywania przyrządów przy silnym wietrze lub zmiennych warunkach pogodowych</li>
+                            <li>Po zgrzaniu przyrządów, wykonaj kontrolne strzelanie z różnych postaw strzeleckich</li>
+                            <li>Zgrywanie przyrządów optycznych (kolimatorów, lunet) odbywa się wg instrukcji producenta</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h4><i class="fas fa-bullseye"></i>Techniki celowania i punkty celowania</h4>
+                    
+                    <div class="info-box">
+                        <p><strong>Podstawowe zasady poprawnego zgrywania przyrządów mechanicznych:</strong></p>
+                        <div style="text-align: center; margin: 20px 0;">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8IS0tIFBvcHJhd25lIHpncnl3YW5pZSBwcnp5cnrEhWTDs3cgLS0+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNTAsIDUwKSI+CiAgICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0id2hpdGUiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIvPgogICAgPHJlY3QgeD0iNDUiIHk9IjAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIyNSIgZmlsbD0iYmxhY2siLz4KICAgIDxyZWN0IHg9IjAiIHk9IjQ1IiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwIiBmaWxsPSJibGFjayIvPgogICAgPGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iMTAiIGZpbGw9IndoaXRlIiBzdHJva2U9ImJsYWNrIi8+CiAgICA8dGV4dCB4PSI1MCIgeT0iMTMwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlBvcHJhd25lIHpncnl3YW5pZTwvdGV4dD4KICA8L2c+CiAgCiAgPCEtLSBQcnp5cnrEhWR5IHphIHd5c29rbyAtLT4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyMDAsIDUwKSI+CiAgICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0id2hpdGUiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIvPgogICAgPHJlY3QgeD0iNDUiIHk9IjAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIzNSIgZmlsbD0iYmxhY2siLz4KICAgIDxyZWN0IHg9IjAiIHk9IjQ1IiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwIiBmaWxsPSJibGFjayIvPgogICAgPGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iMTAiIGZpbGw9IndoaXRlIiBzdHJva2U9ImJsYWNrIi8+CiAgICA8dGV4dCB4PSI1MCIgeT0iMTMwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlByenlyelx1MDEwNWR5IHphIHd5c29rbzwvdGV4dD4KICAgIDx0ZXh0IHg9IjUwIiB5PSIxNDUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+KHN0cnphXHUwMTQyeSBwXHUwMGYzamRcdTAxMDUgemEgbmlza28pPC90ZXh0PgogIDwvZz4KPC9zdmc+" alt="Zgrywanie przyrządów mechanicznych" style="max-width: 100%;">
+                        </div>
+                        
+                        <p><strong>1. Mechanizm zgrywania przyrządów:</strong></p>
+                        <ul>
+                            <li>Przyrządy mechaniczne należy zgrywać w sekwencji: oko - szczerbinka - muszka - cel</li>
+                            <li>Muszka powinna być ustawiona centralnie w szczerbince</li>
+                            <li>Wierzchołek muszki powinien być na równym poziomie z górną krawędzią szczerbinki</li>
+                            <li>Koncentruj wzrok na muszce - musi być ona ostra, szczerbinka i cel mogą być lekko rozmyte</li>
+                        </ul>
+                        
+                        <p><strong>2. Punkty celowania dla różnych odległości:</strong></p>
+                        <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+                            <thead>
+                                <tr>
+                                    <th style="border: 1px solid #ddd; padding: 8px;">Odległość</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px;">Karabinek (nastawa 100 m)</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px;">Pistolet (nastawa 25 m)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">25 m</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">4-5 cm poniżej punktu celowania</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">Bezpośrednio w punkt celowania</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">50 m</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">3-4 cm poniżej punktu celowania</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">2-3 cm powyżej punktu celowania</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">100 m</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">Bezpośrednio w punkt celowania</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">7-10 cm powyżej punktu celowania</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">200 m</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">5-10 cm powyżej punktu celowania</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">Nieefektywne</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">300 m</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">15-25 cm powyżej punktu celowania</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">Nieefektywne</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <p><strong>3. Punkty celowania na sylwetkach:</strong></p>
+                        <div style="text-align: center; margin: 20px 0;">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8IS0tIFN5bHdldGthIGN6xYJvd2lla2EgLS0+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTAwLCA1MCkiPgogICAgPCEtLSBHxYJvd2EgLS0+CiAgICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSI0MCIgcj0iMzAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIvPgogICAgPCEtLSBUdcWCw7N3IC0tPgogICAgPHJlY3QgeD0iNjUiIHk9IjcwIiB3aWR0aD0iNzAiIGhlaWdodD0iOTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcng9IjEwIiByeT0iMTAiLz4KICAgIDwhLS0gTm9naSAtLT4KICAgIDxyZWN0IHg9Ijc1IiB5PSIxNjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSI5MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8cmVjdCB4PSIxMDUiIHk9IjE2MCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjkwIiBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiLz4KICAgIDwhLS0gUsSZY2UgLS0+CiAgICA8bGluZSB4MT0iNjUiIHkxPSI5MCIgeDI9IjQwIiB5Mj0iMTQwIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiLz4KICAgIDxsaW5lIHgxPSIxMzUiIHkxPSI5MCIgeDI9IjE2MCIgeTI9IjE0MCIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICAKICAgIDwhLS0gUHVua3R5IGNlbG93YW5pYSAtLT4KICAgIDxjaXJjbGUgY3g9IjEwMCIgY3k9IjQwIiByPSI1IiBmaWxsPSJyZWQiLz4KICAgIDx0ZXh0IHg9IjE0MCIgeT0iNDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0icmVkIj5HxYJvd2EgLSBzdHJ6YcWCeSB6YXRyenltyW5pYWrEhWNlPC90ZXh0PgogICAgCiAgICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSI5MCIgcj0iNSIgZmlsbD0icmVkIi8+CiAgICA8dGV4dCB4PSIxNDAiIHk9IjkwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9InJlZCI+S2xhdGthIHBpZXJzaW93YSAtIHN0cnphxYJ5IHNtaWVydGVsbmU8L3RleHQ+CiAgICAKICAgIDxjaXJjbGUgY3g9IjEwMCIgY3k9IjEyMCIgcj0iNSIgZmlsbD0icmVkIi8+CiAgICA8dGV4dCB4PSIxNDAiIHk9IjEyMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJyZWQiPkJyenVjaCAtIHN0cnphxYJ5IHNtaWVydGVsbmU8L3RleHQ+CiAgICAKICAgIDxjaXJjbGUgY3g9Ijg1IiBjeT0iMTgwIiByPSI1IiBmaWxsPSJyZWQiLz4KICAgIDx0ZXh0IHg9IjE0MCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9InJlZCI+S29uY3p5bmEgLSBzdHJ6YcWCeSB1bmllem9sYXduaWFqxIVjZTwvdGV4dD4KICA8L2c+Cjwvc3ZnPg==" alt="Punkty celowania na sylwetce" style="max-width: 100%;">
+                        </div>
+                        
+                        <p><strong>4. Zalecane punkty celowania:</strong></p>
+                        <ul>
+                            <li><strong>Strzelanie na krótkich dystansach (do 50 m):</strong> Cel w kształcie głowy - celować w środek twarzy (nos)</li>
+                            <li><strong>Strzelanie na dystansach średnich (50-200 m):</strong> Cel w kształcie popiersia - celować w środek klatki piersiowej</li>
+                            <li><strong>Strzelanie na dystansach długich (powyżej 200 m):</strong> Cel w kształcie pełnej sylwetki - celować w górną część tułowia, z uwzględnieniem poprawki na odległość</li>
+                        </ul>
+                        
+                        <p><strong>5. Wskazówki dla zwiększenia celności:</strong></p>
+                        <ul>
+                            <li>Zachowaj odpowiedni cykl oddechowy: wdech, połowa wydechu, zatrzymanie oddechu, strzał</li>
+                            <li>Utrzymuj odpowiedni nacisk na spust: płynny, jednostajny, bez szarpnięć</li>
+                            <li>Po oddaniu strzału utrzymaj przez chwilę pozycję (tzw. follow through)</li>
+                            <li>Przy strzelaniu seryjnym, po każdym strzale ponownie zgrywaj przyrządy celownicze</li>
+                            <li>Przy silnym wietrze bocznym, w zależności od siły, wprowadź korektę 5-30 cm w kierunku przeciwnym do kierunku wiatru</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Elements
-        const totalInput = document.getElementById('total');
-        const veryGoodInput = document.getElementById('very_good');
-        const goodInput = document.getElementById('good');
-        const satisfactoryInput = document.getElementById('satisfactory');
-        const unsatisfactoryInput = document.getElementById('unsatisfactory');
-        const percentageOutput = document.getElementById('percentage');
-        const meanOutput = document.getElementById('mean');
-        const overallOutput = document.getElementById('overall');
-        const showDetailsBtn = document.getElementById('showDetails');
-        const detailsDiv = document.getElementById('details');
-        const calculateAmmoBtn = document.getElementById('calculateAmmo');
-        const ammoCalculationDiv = document.getElementById('ammoCalculation');
-        const ammoTableBody = document.getElementById('ammoTable').querySelector('tbody');
-        const totalAmmoOutput = document.getElementById('totalAmmo');
-        const shootingConditionsSelect = document.getElementById('shootingConditions');
-        const conditionsDetailsDiv = document.getElementById('conditionsDetails');
-        
-        // Exercise data
-        const exercises = {
-            1: {
-                name: "Strzelanie szkolne Nr 1 – strzelanie na celność i skupienie",
-                ammo: 5,
-                details: `
-                    <h4><i class="fas fa-bullseye"></i> Strzelanie szkolne Nr 1 – strzelanie na celność i skupienie</h4>
-                    <p><strong><i class="fas fa-crosshairs"></i> Cel:</strong> popiersie (figura bojowa nr 23p) na tarczy o wymiarach 0,75x0,75 m, cel stały.</p>
-                    <p><strong><i class="fas fa-ruler-horizontal"></i> Odległość:</strong> 100 m.</p>
-                    <p><strong><i class="fas fa-box"></i> Liczba nabojów:</strong> 5 szt.</p>
-                    <p><strong><i class="fas fa-clock"></i> Czas:</strong> nieograniczony</p>
-                    <p><strong><i class="fas fa-user"></i> Postawa:</strong> leżąca z wykorzystaniem podpórki.</p>
-                    <p><strong><i class="fas fa-fire"></i> Rodzaj ognia:</strong> pojedynczy.</p>
-                    <p><strong><i class="fas fa-star"></i> Ocena:</strong></p>
-                    <ul>
-                        <li>„bardzo dobrze" – uzyskać 40 punktów;</li>
-                        <li>„dobrze" – uzyskać 35 punktów;</li>
-                        <li>„dostatecznie" – uzyskać 30 punktów.</li>
-                    </ul>
-                    <p><strong><i class="fas fa-sun"></i> Warunki strzelania:</strong> dzień.</p>
-                    <p><strong><i class="fas fa-info-circle"></i> Wskazówki:</strong> na komendę kierownika strzelania „Naprzód" strzelający zajmuje stanowisko ogniowe na LOO, przyjmuje postawę strzelecką, wprowadza nabój do komory nabojowej, zabezpiecza broń i melduje gotowość do strzelania przez podniesienie wolnej ręki. Kierownik strzelania podaje następujące komendy: do rozpoczęcia strzelania „Do popiersia ognia", a po zakończeniu strzelania „Przerwij ogień".</p>
-                `
-            },
-            2: {
-                name: "Strzelanie szkolne Nr 2 - strzelanie w postawie leżącej",
-                ammo: 15,
-                details: `
-                    <h4><i class="fas fa-bullseye"></i> Strzelanie szkolne Nr 2 - strzelanie w postawie leżącej</h4>
-                    <p><strong><i class="fas fa-crosshairs"></i> Cele:</strong> karabin maszynowy (figura bojowa nr 27), cel ukazuje się 5 razy na 30 sekund z przerwami 10 sekundowymi.</p>
-                    <p><strong><i class="fas fa-ruler-horizontal"></i> Odległość:</strong> 100 m.</p>
-                    <p><strong><i class="fas fa-box"></i> Liczba nabojów:</strong> 15 szt.</p>
-                    <p><strong><i class="fas fa-clock"></i> Czas:</strong> ograniczony ukazywaniem się celów.</p>
-                    <p><strong><i class="fas fa-user"></i> Postawa:</strong> leżąca z podpórką.</p>
-                    <p><strong><i class="fas fa-fire"></i> Rodzaj ognia:</strong> krótkie serie.</p>
-                    <p><strong><i class="fas fa-star"></i> Ocena:</strong></p>
-                    <ul>
-                        <li>„bardzo dobrze" – trafić cel 4 razy;</li>
-                        <li>„dobrze" – trafić cel 3 razy;</li>
-                        <li>„dostatecznie" – trafić cel 2 razy.</li>
-                    </ul>
-                    <p><strong><i class="fas fa-sun"></i> Warunki strzelania:</strong> dzień, noc, w masce.</p>
-                    <p><strong><i class="fas fa-info-circle"></i> Wskazówki:</strong> na komendę kierownika strzelania „Naprzód" strzelający zajmuje stanowisko ogniowe na LOO, przyjmuje postawą strzelecką i rozpoczyna strzelanie.</p>
-                `
-            },
-            3: {
-                name: "Strzelanie szkolne Nr 1 z karabinka–granatnika wz. 1974/ 5,56 mm kbs wz. 96",
-                ammo: 4,
-                details: `
-                    <h4><i class="fas fa-bullseye"></i> Strzelanie szkolne Nr 1 z karabinka–granatnika wz. 1974/ 5,56 mm kbs wz. 96 – strzelanie w postawie dowolnej</h4>
-                    <p><strong><i class="fas fa-crosshairs"></i> Cel:</strong> grupa piechoty: 3 x biegnący (3 x figura bojowa nr 40) rozmieszczone w środku pola prostokąta o szerokości 10 m i głębokości 20 m.</p>
-                    <p><strong><i class="fas fa-ruler-horizontal"></i> Odległość:</strong> 200 – 250 m.</p>
-                    <p><strong><i class="fas fa-box"></i> Liczba nabojów:</strong> 4 szt. NGO (NGC)-74/ granat nasadkowy do kbs wz 96.</p>
-                    <p><strong><i class="fas fa-clock"></i> Czas:</strong> nieograniczony.</p>
-                    <p><strong><i class="fas fa-user"></i> Postawa:</strong> dowolna.</p>
-                    <p><strong><i class="fas fa-fire"></i> Rodzaj ognia:</strong> pojedynczy.</p>
-                    <p><strong><i class="fas fa-star"></i> Ocena:</strong></p>
-                    <ul>
-                        <li>„bardzo dobrze" – trafić w pole trzy razy;</li>
-                        <li>„dobrze" – trafić w pole dwa razy;</li>
-                        <li>„dostatecznie" – trafić w pole.</li>
-                    </ul>
-                    <p><strong><i class="fas fa-sun"></i> Warunki strzelania:</strong> dzień.</p>
-                    <p><strong><i class="fas fa-info-circle"></i> Wskazówki:</strong> na komendę kierownika strzelania „Naprzód" strzelający zajmuje stanowisko ogniowe na LOO, przyjmuje postawą strzelecką i przygotowuje się do strzelania. Po wykryciu celu strzelający samodzielnie prowadzi ogień.</p>
-                `
-            },
-            4: {
-                name: "Ćwiczenie przygotowawcze z karabinka do pełnienia służby wartowniczej",
-                ammo: 6,
-                details: `
-                    <h4><i class="fas fa-bullseye"></i> Ćwiczenie przygotowawcze z karabinka do pełnienia służby wartowniczej</h4>
-                    <p><strong><i class="fas fa-crosshairs"></i> Cele:</strong></p>
-                    <ul>
-                        <li>nr 1 – 2 x figura bojowa nr 40 (biegnący) ukazuje i ukrywa się na komendę kierownika strzelania;</li>
-                        <li>nr 2 – figura bojowa nr 23 (popiersie);</li>
-                        <li>nr 3 – figura bojowa nr 30 (klęczący);</li>
-                        <li>Cele nr 2 i 3 ukazują się jednocześnie na 25 sekund po 10 sekundach od ukrycia się celu nr 1.</li>
-                    </ul>
-                    <p><strong><i class="fas fa-ruler-horizontal"></i> Odległość:</strong></p>
-                    <ul>
-                        <li>do celu nr 1 – 150 m; (Do celu nr 1 nie prowadzi się ognia)</li>
-                        <li>do celu nr 2 – 75 m;</li>
-                        <li>do celu nr 3 – 100 m.</li>
-                    </ul>
-                    <p><strong><i class="fas fa-box"></i> Liczba nabojów:</strong> 6 szt.</p>
-                    <p><strong><i class="fas fa-clock"></i> Czas:</strong> ograniczony ukazywaniem się celów.</p>
-                    <p><strong><i class="fas fa-user"></i> Postawa:</strong></p>
-                    <ul>
-                        <li>do celu nr 1 – stojąca;</li>
-                        <li>do celu nr 2 i 3 – klęcząca za ukryciem.</li>
-                    </ul>
-                    <p><strong><i class="fas fa-fire"></i> Rodzaj ognia:</strong> ogień pojedynczy.</p>
-                    <p><strong><i class="fas fa-star"></i> Ocena:</strong></p>
-                    <ul>
-                        <li>„bardzo dobrze" – trafić dwa cele;</li>
-                        <li>„dobrze" – trafić cel nr 2;</li>
-                        <li>„dostatecznie" – trafić cel nr 3.</li>
-                    </ul>
-                    <p><strong><i class="fas fa-sun"></i> Warunki strzelania:</strong> dzień, noc.</p>
-                `
-            },
-            5: {
-                name: "Ćwiczenie przygotowawcze z karabinka Mini Beryl do pełnienia służby wartowniczej",
-                ammo: 6,
-                details: `
-                    <h4><i class="fas fa-bullseye"></i> Ćwiczenie przygotowawcze z karabinka Mini Beryl do pełnienia służby wartowniczej</h4>
-                    <p><strong><i class="fas fa-crosshairs"></i> Cele:</strong></p>
-                    <ul>
-                        <li>nr 1 – 2 x figura bojowa nr 40 (biegnący) ukazuje i ukrywa się na komendę kierownika strzelania; (Do celu nr 1 nie prowadzi się ognia)</li>
-                        <li>nr 2 – figura bojowa nr 23 (popiersie);</li>
-                        <li>nr 3 – figura bojowa nr 30 (klęczący);</li>
-                        <li>Cele nr 2 i 3 ukazują się jednocześnie na 25 sekund po 10 sekundach od ukrycia się celu nr 1.</li>
-                    </ul>
-                    <p><strong><i class="fas fa-ruler-horizontal"></i> Odległość:</strong></p>
-                    <ul>
-                        <li>do celu nr 1 – 150 m;</li>
-                        <li>do celu nr 2 – 50 m;</li>
-                        <li>do celu nr 3 – 75 m.</li>
-                    </ul>
-                    <p><strong><i class="fas fa-box"></i> Liczba nabojów:</strong> 6 szt. (w pistoletach, które nie mają przełącznika rodzaju ognia 12 szt.).</p>
-                    <p><strong><i class="fas fa-clock"></i> Czas:</strong> ograniczony ukazywaniem się celów.</p>
-                    <p><strong><i class="fas fa-user"></i> Postawa:</strong></p>
-                    <ul>
-                        <li>do celu nr 1 – stojąca;</li>
-                        <li>do celu nr 2 i 3 – klęcząca za ukryciem.</li>
-                    </ul>
-                    <p><strong><i class="fas fa-fire"></i> Rodzaj ognia:</strong> ogień pojedynczy (w pistoletach, które nie mają przełącznika rodzaju ognia krótkimi seriami).</p>
-                    <p><strong><i class="fas fa-star"></i> Ocena:</strong></p>
-                    <ul>
-                        <li>„bardzo dobrze" – trafić dwa cele;</li>
-                        <li>„dobrze" – trafić cel nr 2;</li>
-                        <li>„dostatecznie" – trafić cel nr 3.</li>
-                    </ul>
-                    <p><strong><i class="fas fa-sun"></i> Warunki strzelania:</strong> dzień, noc.</p>
-                `
-            },
-            6: {
-                name: "Ćwiczenie przygotowawcze z karabinka Mini Beryl (pistolet)",
-                ammo: 12
-            },
-            7: {
-                name: "Ćwiczenie przygotowawcze z pistoletu maszynowego do pełnienia służby wartowniczej",
-                ammo: 5,
-                details: `
-                    <h4><i class="fas fa-bullseye"></i> Ćwiczenie przygotowawcze z pistoletu maszynowego do pełnienia służby wartowniczej</h4>
-                    <p><strong><i class="fas fa-crosshairs"></i> Cele:</strong></p>
-                    <ul>
-                        <li>nr 1 – figura bojowa nr TS-10 ukazuje się dwa razy; pierwsze ukazanie – na 20 sekund; drugie ukazanie na 10 sekund, bezpośrednio po trafieniu lub ukryciu się celu nr 2;</li>
-                        <li>nr 2 – figura bojowa TS-10, ukazuje się na 10 sekund, po 5 sekundach od trafienia lub ukryciu się celu nr 1 po jego pierwszym ukazaniu;</li>
-                        <li>nr 3 – figura bojowa nr TS-10, ukazuje się na 10 sekund, cel ukazuje się bezpośrednio po trafieniu lub ukryciu się celu nr 1 po jego drugim ukazaniu.</li>
-                    </ul>
-                    <p><strong><i class="fas fa-ruler-horizontal"></i> Odległość:</strong></p>
-                    <ul>
-                        <li>do celu nr 1 i 2 – 40-50 m;</li>
-                        <li>do celu nr 3 – 20-25 m.</li>
-                    </ul>
-                    <p><strong><i class="fas fa-box"></i> Liczba nabojów:</strong> 5 szt.</p>
-                    <p><strong><i class="fas fa-clock"></i> Czas:</strong> ograniczony ukazywaniem się celów.</p>
-                    <p><strong><i class="fas fa-user"></i> Postawa:</strong> dowolna (według decyzji strzelającego).</p>
-                    <p><strong><i class="fas fa-fire"></i> Rodzaj ognia:</strong> ogień pojedynczy.</p>
-                    <p><strong><i class="fas fa-star"></i> Ocena:</strong></p>
-                    <ul>
-                        <li>„bardzo dobrze" – trafić trzy cele;</li>
-                        <li>„dobrze" – trafić dwa cele;</li>
-                        <li>„dostatecznie" – trafić jeden cel.</li>
-                    </ul>
-                    <p><strong><i class="fas fa-sun"></i> Warunki strzelania:</strong> dzień.</p>
-                `
-            }
-        };
-        
-        // Calculate results function
-        function calculateResults() {
-            const total = parseInt(totalInput.value) || 0;
-            const veryGood = parseInt(veryGoodInput.value) || 0;
-            const good = parseInt(goodInput.value) || 0;
-            const satisfactory = parseInt(satisfactoryInput.value) || 0;
-            const unsatisfactory = parseInt(unsatisfactoryInput.value) || 0;
+        // Czekamy na załadowanie dokumentu
+        document.addEventListener('DOMContentLoaded', function() {
+            // Podstawowe elementy
+            const totalInput = document.getElementById('total');
+            const veryGoodInput = document.getElementById('very_good');
+            const goodInput = document.getElementById('good');
+            const satisfactoryInput = document.getElementById('satisfactory');
+            const unsatisfactoryInput = document.getElementById('unsatisfactory');
+            const percentageOutput = document.getElementById('percentage');
+            const meanOutput = document.getElementById('mean');
+            const overallOutput = document.getElementById('overall');
             
-            // Validate inputs
-            if (veryGood + good + satisfactory + unsatisfactory > total) {
-                alert("Suma poszczególnych ocen nie może przekraczać łącznej liczby strzelających!");
-                return;
-            }
+            // Przyciski i sekcje
+            const showDetailsBtn = document.getElementById('showDetails');
+            const detailsSection = document.getElementById('detailsSection');
+            const techDetailsBtn = document.getElementById('techDetails');
+            const technicalSection = document.getElementById('technicalSection');
+            const savePdfBtn = document.getElementById('savePdf');
             
-            // Calculate percentage of completion
-            const positiveResults = veryGood + good + satisfactory;
-            const percentage = total > 0 ? (positiveResults / total * 100) : 0;
-            percentageOutput.value = percentage.toFixed(2) + "%";
+            // Elementy do amunicji
+            const calculateAmmoBtn = document.getElementById('calculateAmmo');
+            const ammoCalculationDiv = document.getElementById('ammoCalculation');
+            const ammoTableBody = document.getElementById('ammoTable').querySelector('tbody');
+            const totalAmmoOutput = document.getElementById('totalAmmo');
             
-            // Calculate arithmetic mean
-            const sum = 5 * veryGood + 4 * good + 3 * satisfactory + 2 * unsatisfactory;
-            const mean = total > 0 ? (sum / total) : 0;
-            meanOutput.value = mean.toFixed(2);
+            // Elementy do warunków strzelania
+            const shootingConditionsSelect = document.getElementById('shootingConditions');
+            const conditionsDetailsDiv = document.getElementById('conditionsDetails');
             
-            // Determine overall assessment
-            let overall = "Niedostateczna";
-            if (mean >= 4.51) {
-                overall = "Bardzo dobra";
-            } else if (mean >= 3.51) {
-                overall = "Dobra";
-            } else if (mean >= 2.51) {
-                overall = "Dostateczna";
-            }
-            overallOutput.value = overall;
-        }
-        
-        // Calculate ammunition usage
-        function calculateAmmoUsage() {
-            const total = parseInt(totalInput.value) || 0;
-            if (total === 0) {
-                alert("Proszę wprowadzić liczbę strzelających!");
-                return;
-            }
+            // Elementy do danych technicznych
+            const weaponTypeSelect = document.getElementById('weaponType');
+            const weaponDataDiv = document.getElementById('weaponData');
             
-            const selectedExercises = Array.from(document.getElementById('shootingExercise').selectedOptions)
-                .map(option => parseInt(option.value));
+            // Dane ćwiczeń
+            const exercises = {
+                1: {
+                    name: "Strzelanie szkolne Nr 1 – strzelanie na celność i skupienie",
+                    ammo: 5,
+                    details: `
+                        <h4><i class="fas fa-bullseye"></i> Strzelanie szkolne Nr 1 – strzelanie na celność i skupienie</h4>
+                        <p><strong><i class="fas fa-crosshairs"></i> Cel:</strong> popiersie (figura bojowa nr 23p) na tarczy o wymiarach 0,75x0,75 m, cel stały.</p>
+                        <p><strong><i class="fas fa-ruler-horizontal"></i> Odległość:</strong> 100 m.</p>
+                        <p><strong><i class="fas fa-box"></i> Liczba nabojów:</strong> 5 szt.</p>
+                        <p><strong><i class="fas fa-clock"></i> Czas:</strong> nieograniczony</p>
+                        <p><strong><i class="fas fa-user"></i> Postawa:</strong> leżąca z wykorzystaniem podpórki.</p>
+                        <p><strong><i class="fas fa-fire"></i> Rodzaj ognia:</strong> pojedynczy.</p>
+                        <p><strong><i class="fas fa-star"></i> Ocena:</strong></p>
+                        <ul>
+                            <li>„bardzo dobrze" – uzyskać 40 punktów;</li>
+                            <li>„dobrze" – uzyskać 35 punktów;</li>
+                            <li>„dostatecznie" – uzyskać 30 punktów.</li>
+                        </ul>
+                        <p><strong><i class="fas fa-sun"></i> Warunki strzelania:</strong> dzień.</p>
+                        <p><strong><i class="fas fa-info-circle"></i> Wskazówki:</strong> na komendę kierownika strzelania „Naprzód" strzelający zajmuje stanowisko ogniowe na LOO, przyjmuje postawę strzelecką, wprowadza nabój do komory nabojowej, zabezpiecza broń i melduje gotowość do strzelania przez podniesienie wolnej ręki. Kierownik strzelania podaje następujące komendy: do rozpoczęcia strzelania „Do popiersia ognia", a po zakończeniu strzelania „Przerwij ogień".</p>
+                    `
+                },
+                2: {
+                    name: "Strzelanie szkolne Nr 2 - strzelanie w postawie leżącej",
+                    ammo: 15,
+                    details: `
+                        <h4><i class="fas fa-bullseye"></i> Strzelanie szkolne Nr 2 - strzelanie w postawie leżącej</h4>
+                        <p><strong><i class="fas fa-crosshairs"></i> Cele:</strong> karabin maszynowy (figura bojowa nr 27), cel ukazuje się 5 razy na 30 sekund z przerwami 10 sekundowymi.</p>
+                        <p><strong><i class="fas fa-ruler-horizontal"></i> Odległość:</strong> 100 m.</p>
+                        <p><strong><i class="fas fa-box"></i> Liczba nabojów:</strong> 15 szt.</p>
+                        <p><strong><i class="fas fa-clock"></i> Czas:</strong> ograniczony ukazywaniem się celów.</p>
+                        <p><strong><i class="fas fa-user"></i> Postawa:</strong> leżąca z podpórką.</p>
+                        <p><strong><i class="fas fa-fire"></i> Rodzaj ognia:</strong> krótkie serie.</p>
+                        <p><strong><i class="fas fa-star"></i> Ocena:</strong></p>
+                        <ul>
+                            <li>„bardzo dobrze" – trafić cel 4 razy;</li>
+                            <li>„dobrze" – trafić cel 3 razy;</li>
+                            <li>„dostatecznie" – trafić cel 2 razy.</li>
+                        </ul>
+                        <p><strong><i class="fas fa-sun"></i> Warunki strzelania:</strong> dzień, noc, w masce.</p>
+                        <p><strong><i class="fas fa-info-circle"></i> Wskazówki:</strong> na komendę kierownika strzelania „Naprzód" strzelający zajmuje stanowisko ogniowe na LOO, przyjmuje postawą strzelecką i rozpoczyna strzelanie.</p>
+                    `
+                },
+                3: {
+                    name: "Strzelanie szkolne Nr 1 z karabinka–granatnika wz. 1974/ 5,56 mm kbs wz. 96",
+                    ammo: 4,
+                    details: `
+                        <h4><i class="fas fa-bullseye"></i> Strzelanie szkolne Nr 1 z karabinka–granatnika wz. 1974/ 5,56 mm kbs wz. 96 – strzelanie w postawie dowolnej</h4>
+                        <p><strong><i class="fas fa-crosshairs"></i> Cel:</strong> grupa piechoty: 3 x biegnący (3 x figura bojowa nr 40) rozmieszczone w środku pola prostokąta o szerokości 10 m i głębokości 20 m.</p>
+                        <p><strong><i class="fas fa-ruler-horizontal"></i> Odległość:</strong> 200 – 250 m.</p>
+                        <p><strong><i class="fas fa-box"></i> Liczba nabojów:</strong> 4 szt. NGO (NGC)-74/ granat nasadkowy do kbs wz 96.</p>
+                        <p><strong><i class="fas fa-clock"></i> Czas:</strong> nieograniczony.</p>
+                        <p><strong><i class="fas fa-user"></i> Postawa:</strong> dowolna.</p>
+                        <p><strong><i class="fas fa-fire"></i> Rodzaj ognia:</strong> pojedynczy.</p>
+                        <p><strong><i class="fas fa-star"></i> Ocena:</strong></p>
+                        <ul>
+                            <li>„bardzo dobrze" – trafić w pole trzy razy;</li>
+                            <li>„dobrze" – trafić w pole dwa razy;</li>
+                            <li>„dostatecznie" – trafić w pole.</li>
+                        </ul>
+                        <p><strong><i class="fas fa-sun"></i> Warunki strzelania:</strong> dzień.</p>
+                        <p><strong><i class="fas fa-info-circle"></i> Wskazówki:</strong> na komendę kierownika strzelania „Naprzód" strzelający zajmuje stanowisko ogniowe na LOO, przyjmuje postawą strzelecką i przygotowuje się do strzelania. Po wykryciu celu strzelający samodzielnie prowadzi ogień.</p>
+                    `
+                },
+                4: {
+                    name: "Ćwiczenie przygotowawcze z karabinka do pełnienia służby wartowniczej",
+                    ammo: 6,
+                    details: `
+                        <h4><i class="fas fa-bullseye"></i> Ćwiczenie przygotowawcze z karabinka do pełnienia służby wartowniczej</h4>
+                        <p><strong><i class="fas fa-crosshairs"></i> Cele:</strong></p>
+                        <ul>
+                            <li>nr 1 – 2 x figura bojowa nr 40 (biegnący) ukazuje i ukrywa się na komendę kierownika strzelania;</li>
+                            <li>nr 2 – figura bojowa nr 23 (popiersie);</li>
+                            <li>nr 3 – figura bojowa nr 30 (klęczący);</li>
+                            <li>Cele nr 2 i 3 ukazują się jednocześnie na 25 sekund po 10 sekundach od ukrycia się celu nr 1.</li>
+                        </ul>
+                        <p><strong><i class="fas fa-ruler-horizontal"></i> Odległość:</strong></p>
+                        <ul>
+                            <li>do celu nr 1 – 150 m; (Do celu nr 1 nie prowadzi się ognia)</li>
+                            <li>do celu nr 2 – 75 m;</li>
+                            <li>do celu nr 3 – 100 m.</li>
+                        </ul>
+                        <p><strong><i class="fas fa-box"></i> Liczba nabojów:</strong> 6 szt.</p>
+                        <p><strong><i class="fas fa-clock"></i> Czas:</strong> ograniczony ukazywaniem się celów.</p>
+                        <p><strong><i class="fas fa-user"></i> Postawa:</strong></p>
+                        <ul>
+                            <li>do celu nr 1 – stojąca;</li>
+                            <li>do celu nr 2 i 3 – klęcząca za ukryciem.</li>
+                        </ul>
+                        <p><strong><i class="fas fa-fire"></i> Rodzaj ognia:</strong> ogień pojedynczy.</p>
+                        <p><strong><i class="fas fa-star"></i> Ocena:</strong></p>
+                        <ul>
+                            <li>„bardzo dobrze" – trafić dwa cele;</li>
+                            <li>„dobrze" – trafić cel nr 2;</li>
+                            <li>„dostatecznie" – trafić cel nr 3.</li>
+                        </ul>
+                        <p><strong><i class="fas fa-sun"></i> Warunki strzelania:</strong> dzień, noc.</p>
+                    `
+                },
+                5: {
+                    name: "Ćwiczenie przygotowawcze z karabinka Mini Beryl do pełnienia służby wartowniczej",
+                    ammo: 6,
+                    details: `
+                        <h4><i class="fas fa-bullseye"></i> Ćwiczenie przygotowawcze z karabinka Mini Beryl do pełnienia służby wartowniczej</h4>
+                        <p><strong><i class="fas fa-crosshairs"></i> Cele:</strong></p>
+                        <ul>
+                            <li>nr 1 – 2 x figura bojowa nr 40 (biegnący) ukazuje i ukrywa się na komendę kierownika strzelania; (Do celu nr 1 nie prowadzi się ognia)</li>
+                            <li>nr 2 – figura bojowa nr 23 (popiersie);</li>
+                            <li>nr 3 – figura bojowa nr 30 (klęczący);</li>
+                            <li>Cele nr 2 i 3 ukazują się jednocześnie na 25 sekund po 10 sekundach od ukrycia się celu nr 1.</li>
+                        </ul>
+                        <p><strong><i class="fas fa-ruler-horizontal"></i> Odległość:</strong></p>
+                        <ul>
+                            <li>do celu nr 1 – 150 m;</li>
+                            <li>do celu nr 2 – 50 m;</li>
+                            <li>do celu nr 3 – 75 m.</li>
+                        </ul>
+                        <p><strong><i class="fas fa-box"></i> Liczba nabojów:</strong> 6 szt. (w pistoletach, które nie mają przełącznika rodzaju ognia 12 szt.).</p>
+                        <p><strong><i class="fas fa-clock"></i> Czas:</strong> ograniczony ukazywaniem się celów.</p>
+                        <p><strong><i class="fas fa-user"></i> Postawa:</strong></p>
+                        <ul>
+                            <li>do celu nr 1 – stojąca;</li>
+                            <li>do celu nr 2 i 3 – klęcząca za ukryciem.</li>
+                        </ul>
+                        <p><strong><i class="fas fa-fire"></i> Rodzaj ognia:</strong> ogień pojedynczy (w pistoletach, które nie mają przełącznika rodzaju ognia krótkimi seriami).</p>
+                        <p><strong><i class="fas fa-star"></i> Ocena:</strong></p>
+                        <ul>
+                            <li>„bardzo dobrze" – trafić dwa cele;</li>
+                            <li>„dobrze" – trafić cel nr 2;</li>
+                            <li>„dostatecznie" – trafić cel nr 3.</li>
+                        </ul>
+                        <p><strong><i class="fas fa-sun"></i> Warunki strzelania:</strong> dzień, noc.</p>
+                    `
+                },
+                6: {
+                    name: "Ćwiczenie przygotowawcze z karabinka Mini Beryl (pistolet)",
+                    ammo: 12
+                },
+                7: {
+                    name: "Ćwiczenie przygotowawcze z pistoletu maszynowego do pełnienia służby wartowniczej",
+                    ammo: 5,
+                    details: `
+                        <h4><i class="fas fa-bullseye"></i> Ćwiczenie przygotowawcze z pistoletu maszynowego do pełnienia służby wartowniczej</h4>
+                        <p><strong><i class="fas fa-crosshairs"></i> Cele:</strong></p>
+                        <ul>
+                            <li>nr 1 – figura bojowa nr TS-10 ukazuje się dwa razy; pierwsze ukazanie – na 20 sekund; drugie ukazanie na 10 sekund, bezpośrednio po trafieniu lub ukryciu się celu nr 2;</li>
+                            <li>nr 2 – figura bojowa TS-10, ukazuje się na 10 sekund, po 5 sekundach od trafienia lub ukryciu się celu nr 1 po jego pierwszym ukazaniu;</li>
+                            <li>nr 3 – figura bojowa nr TS-10, ukazuje się na 10 sekund, cel ukazuje się bezpośrednio po trafieniu lub ukryciu się celu nr 1 po jego drugim ukazaniu.</li>
+                        </ul>
+                        <p><strong><i class="fas fa-ruler-horizontal"></i> Odległość:</strong></p>
+                        <ul>
+                            <li>do celu nr 1 i 2 – 40-50 m;</li>
+                            <li>do celu nr 3 – 20-25 m.</li>
+                        </ul>
+                        <p><strong><i class="fas fa-box"></i> Liczba nabojów:</strong> 5 szt.</p>
+                        <p><strong><i class="fas fa-clock"></i> Czas:</strong> ograniczony ukazywaniem się celów.</p>
+                        <p><strong><i class="fas fa-user"></i> Postawa:</strong> dowolna (według decyzji strzelającego).</p>
+                        <p><strong><i class="fas fa-fire"></i> Rodzaj ognia:</strong> ogień pojedynczy.</p>
+                        <p><strong><i class="fas fa-star"></i> Ocena:</strong></p>
+                        <ul>
+                            <li>„bardzo dobrze" – trafić trzy cele;</li>
+                            <li>„dobrze" – trafić dwa cele;</li>
+                            <li>„dostatecznie" – trafić jeden cel.</li>
+                        </ul>
+                        <p><strong><i class="fas fa-sun"></i> Warunki strzelania:</strong> dzień.</p>
+                    `
+                }
+            };
             
-            if (selectedExercises.length === 0) {
-                alert("Proszę wybrać co najmniej jedno ćwiczenie!");
-                return;
-            }
+            // Dane broni
+            const weaponSpecs = {
+                kbk_akm: {
+                    name: "Karabinek AKM",
+                    caliber: "7,62 mm",
+                    length: "870 mm",
+                    barrel_length: "415 mm",
+                    weight: "3,14 kg",
+                    rate_of_fire: "600 strz./min",
+                    magazine: "30 nabojów",
+                    effective_range: "do 400 m",
+                    image: `<div style="text-align: center; margin: 15px 0;">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxnIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIj4KICAgIDxwYXRoIGQ9Ik0xMCw0MCBMNDAsNDAgTDQwLDM1IEw3MCwzNSBMNzAsMzAgTDEwMCwzMCBMMTAwLDQwIEwyNjAsNDAgTDI5MCwzNSBMMjkwLDQ1IEwyNjAsNDAgTDEwMCw0MCBMMTBMNDIGIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogICAgPHBhdGggZD0iTTI2MCw0MCBMMjYwLDUwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICAgIDxwYXRoIGQ9Ik0xMDAsMzUgTDEwMCw0NSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8cGF0aCBkPSJNNDAsNDAgTDQwLDUwIEwzMCw1NSBMMjUsNTAgTDMwLDQ1IEw0MCw0MCIgZmlsbD0iI2JiYiIvPgogIDwvZz4KICA8dGV4dCB4PSIxODAiIHk9IjIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMzMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPktBUkFCSU5FSyBBS008L3RleHQ+Cjwvc3ZnPg==" alt="Schematyczny rysunek karabinka AKM" style="max-width: 300px;">
+                    </div>`,
+                    description: "Karabinek AKM to unowocześniona wersja karabinka AK. Charakteryzuje się wysoką niezawodnością działania nawet w trudnych warunkach terenowych i klimatycznych. Broń przeznaczona do niszczenia siły żywej przeciwnika."
+                },
+                kbk_beryl: {
+                    name: "Karabinek wz. 96 Beryl",
+                    caliber: "5,56 mm",
+                    length: "943 mm (z rozłożoną kolbą), 673 mm (ze złożoną kolbą)",
+                    barrel_length: "406 mm",
+                    weight: "3,65 kg (bez magazynka)",
+                    rate_of_fire: "700-900 strz./min (teoretyczna)",
+                    magazine: "30 nabojów",
+                    effective_range: "do 500 m",
+                    image: `<div style="text-align: center; margin: 15px 0;">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxnIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIj4KICAgIDxwYXRoIGQ9Ik0xMCw0MCBMNDAsNDAgTDQwLDM1IEw3NSwzNSBMODAsMzAgTDEwMCwzMCBMMTEwLDM1IEwxMTAsNDAgTDI2MCw0MCBMMjkwLDM1IEwyOTAsNDUgTDI2MCw0MCBMMTBMNDIGIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogICAgPHBhdGggZD0iTTI2MCw0MCBMMjYwLDUwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICAgIDxwYXRoIGQ9Ik0xMTAsMzUgTDExMCw0NSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8cGF0aCBkPSJNNDAsNDAgTDQwLDUwIEwzMCw1NSBMMjUsNTAgTDMwLDQ1IEw0MCw0MCIgZmlsbD0iI2JiYiIvPgogICAgPHBhdGggZD0iTTI2MCwzNSBMMjgwLDM1IEwyODAsNDUgTDI2MCw0NSIgZmlsbD0iI2JiYiIvPgogIDwvZz4KICA8dGV4dCB4PSIxODAiIHk9IjIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMzMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPktBUkFCSU5FSyBCRVJZTDwvdGV4dD4KPC9zdmc+" alt="Schematyczny rysunek karabinka Beryl" style="max-width: 300px;">
+                    </div>`,
+                    description: "Karabinek wz. 96 Beryl jest bronią automatyczną przeznaczoną do rażenia celów na odległości do 500 m. Jest następcą karabinka wz. 88 Tantal. Wyposażony w szynę umożliwiającą montaż różnych przyrządów celowniczych.",
+                    extendedData: `
+                    <div class="detailed-specs">
+                        <h4><i class="fas fa-industry"></i> Producent broni</h4>
+                        <ul>
+                            <li>Fabryka Broni „Łucznik"-Radom Sp. Z.o.o. w Radomiu</li>
+                        </ul>
+                        
+                        <h4><i class="fas fa-file-alt"></i> Tytuł i sygnatura</h4>
+                        <ul>
+                            <li>Instrukcja zakładowa; Instrukcja Użytkowania 5,56 mm karabinku standardowego (podstawowego)</li>
+                        </ul>
+                        
+                        <h4><i class="fas fa-info-circle"></i> Ogólna charakterystyka broni</h4>
+                        <ul>
+                            <li><strong>Przeznaczenie:</strong> do zwalczania siły żywej na odległościach do 500 metrów</li>
+                            <li><strong>Typ broni:</strong> indywidualna automatyczna broni strzelecka (samoczynna-samopowtarzalna)</li>
+                            <li><strong>Zasada działania broni:</strong> odprowadzenie części gazów prochowych przez boczny otwór w lufie</li>
+                            <li><strong>Ryglowanie broni:</strong> przez obrót zamka</li>
+                            <li><strong>Mechanizm spustowy:</strong> z przełącznikiem rodzaju ognia; ogień pojedynczy oraz ogień ciągły</li>
+                            <li><strong>Mechanizm zabezpieczający:</strong> nastawny bezpiecznik skrzydełkowy oraz spust samoczynny</li>
+                            <li><strong>Zasilanie broni:</strong> magazynek łukowy, wymienny, standardowy o pojemności 30 naboi</li>
+                        </ul>
+                        
+                        <h4><i class="fas fa-bullseye"></i> Zastosowana amunicja</h4>
+                        <ul>
+                            <li><strong>Typ zastosowanego naboju:</strong> 5,56 x 45 mm NATO</li>
+                            <li><strong>Rodzaje stosowanych naboi:</strong> z pociskiem zwykłym z płaszczem stalowym typu RS, nabój z pociskiem smogowym typu SM oraz nabój z ślepym pociskiem</li>
+                            <li><strong>Masa naboju:</strong> w zależności od wersji 12,3-12,4 g</li>
+                            <li><strong>Masa pocisku:</strong> w zależności od wersji 4,0-4,1 g</li>
+                        </ul>
+                        
+                        <h4><i class="fas fa-tools"></i> Standardowe wyposażenie broni</h4>
+                        <ul>
+                            <li>Mechaniczne przyrządy celownicze, chwyt przedni, paś nośny, zestaw do czyszczenia i konserwacji broni, nóż-bagnet, osiem magazynków, odrzutnik do strzelania ślepą amunicją</li>
+                        </ul>
+                        
+                        <h4><i class="fas fa-cogs"></i> Szczegółowe dane taktyczno-techniczne</h4>
+                        <ul>
+                            <li><strong>Kaliber lufy:</strong> 5,56 mm</li>
+                            <li><strong>Długość broni z kolbą:</strong> wsuniętą – 902 mm, wysuniętą – 943 mm</li>
+                            <li><strong>Długość broni z kolbą złożoną:</strong> 673 mm</li>
+                            <li><strong>Długość podstawowej lufy:</strong> 406 mm</li>
+                            <li><strong>Liczba bruzd:</strong> 6</li>
+                            <li><strong>Skok bruzd:</strong> 178 mm</li>
+                            <li><strong>Masa broni bez magazynka:</strong> 3,65 kg</li>
+                            <li><strong>Masa magazynka niezaładowanego:</strong> 0,15 kg</li>
+                            <li><strong>Masa broni załadowanej:</strong> 4,15 kg</li>
+                            <li><strong>Pojemność podstawowego magazynka:</strong> 30 naboi</li>
+                            <li><strong>Odległość celowania:</strong> 100-1000 m</li>
+                            <li><strong>Prędkość początkowa wystrzelonego pocisku:</strong> 890 m/s</li>
+                            <li><strong>Energia początkowa wystrzelonego pocisku:</strong> 1585 J</li>
+                            <li><strong>Szybkostrzelność teoretyczna:</strong> 700-900 strz./min.</li>
+                            <li><strong>Szybkostrzelność praktyczna:</strong> ogniem ciągłym – do 100 strz./min., ogniem pojedynczym – do 40 strz./min.</li>
+                        </ul>
+                    </div>
+                    `
+                },
+                kbk_mini_beryl: {
+                    name: "Karabinek Mini Beryl",
+                    caliber: "5,56 mm",
+                    length: "730 mm (z rozłożoną kolbą)",
+                    barrel_length: "235 mm",
+                    weight: "3,0 kg",
+                    rate_of_fire: "700 strz./min",
+                    magazine: "30 nabojów",
+                    effective_range: "do 400 m",
+                    image: `<div style="text-align: center; margin: 15px 0;">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxnIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIj4KICAgIDxwYXRoIGQ9Ik01MCw0MCBMODAsNDAgTDgwLDM1IEwxMDAsMzUgTDExMCwzMCBMMTMwLDMwIEwxNDAsMzUgTDE0MCw0MCBMMjQwLDQwIEwyNTAsMzUgTDI1MCw0NSBMMjQwLDQwIEw1MCw0MCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8cGF0aCBkPSJNMjQwLDQwIEwyNDAsNTAiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogICAgPHBhdGggZD0iTTE0MCwzNSBMMTQwLDQ1IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICAgIDxwYXRoIGQ9Ik04MCw0MCBMODAsNTAgTDcwLDU1IEw2NSw1MCBMNzAsNDUgTDgwLDQwIiBmaWxsPSIjYmJiIi8+CiAgPC9nPgogIDx0ZXh0IHg9IjE1MCIgeT0iMjAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzMzMyIgdGV4dC1hbmNob3I9Im1pZGRsZSI+TUlOSSBCRVJZTDwvdGV4dD4KPC9zdmc+" alt="Schematyczny rysunek karabinka Mini Beryl" style="max-width: 300px;">
+                    </div>`,
+                    description: "Mini Beryl to skrócona wersja karabinka wz. 96 Beryl. Przeznaczony głównie dla załóg wozów bojowych, jednostek specjalnych oraz do działań w terenie zabudowanym. Mniejsze wymiary ułatwiają operowanie bronią w ograniczonych przestrzeniach."
+                },
+                pm_pm63: {
+                    name: "Pistolet maszynowy PM-63 RAK",
+                    caliber: "9 mm Makarow",
+                    length: "583 mm (z rozłożoną kolbą), 333 mm (ze złożoną kolbą)",
+                    barrel_length: "152 mm",
+                    weight: "1,6 kg (bez magazynka)",
+                    rate_of_fire: "650 strz./min",
+                    magazine: "15 lub 25 nabojów",
+                    effective_range: "do 150 m",
+                    image: `<div style="text-align: center; margin: 15px 0;">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxnIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIj4KICAgIDxwYXRoIGQ9Ik04MCw0MCBMMTAwLDQwIEwxMDAsMzUgTDEyMCwzNSBMMTMwLDMwIEwxNTAsMzAgTDE2MCwzNSBMMTYwLDQwIEwyMDAsNDAgTDIxMCwzNSBMMjEwLDQ1IEwyMDAsNDAgTDgwLDQwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICAgIDxwYXRoIGQ9Ik0xMjAsNDAgTDEyMCw1NSBIIGQ9Ik0xNjAsNDAgTDE2MCw1MCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8cGF0aCBkPSJNOTAsNDAgTDkwLDUwIEw4MCw1NSBMNzUsNTAgTDgwLDQ1IEw5MCw0MCIgZmlsbD0iI2JiYiIvPgogIDwvZz4KICA8dGV4dCB4PSIxNjAiIHk9IjIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMzMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlBNLTYzIFJBSzwvdGV4dD4KPC9zdmc+" alt="Schematyczny rysunek pistoletu maszynowego PM-63 RAK" style="max-width: 300px;">
+                    </div>`,
+                    description: "PM-63 RAK to pistolet maszynowy polskiej konstrukcji, wprowadzony do uzbrojenia w 1965 roku. Charakteryzuje się niewielkimi wymiarami i masą. Wyposażony w składaną kolbę, co umożliwia łatwe przenoszenie i użycie jako broni osobistej."
+                },
+                pm_pm84: {
+                    name: "Pistolet maszynowy PM-84 Glauberyt",
+                    caliber: "9 mm Parabellum",
+                    length: "576 mm (z rozłożoną kolbą), 375 mm (ze złożoną kolbą)",
+                    barrel_length: "192 mm",
+                    weight: "2,3 kg (bez magazynka)",
+                    rate_of_fire: "650 strz./min",
+                    magazine: "15 lub 25 nabojów",
+                    effective_range: "do 150 m",
+                    image: `<div style="text-align: center; margin: 15px 0;">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxnIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIj4KICAgIDxwYXRoIGQ9Ik04MCw0MCBMMTAwLDQwIEwxMDAsMzUgTDEyMCwzNSBMMTIwLDMwIEwxNTAsMzAgTDE2MCwzNSBMMTYwLDQwIEwyMjAsNDAgTDIzMCwzNSBMMjMwLDQ1IEwyMjAsNDAgTDgwLDQwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICAgIDxwYXRoIGQ9Ik0xMjAsNDAgTDEyMCw1NSBIIGQ9Ik0xNjAsNDAgTDE2MCw1MCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8cGF0aCBkPSJNOTAsNDAgTDkwLDUwIEw4MCw1NSBMNzUsNTAgTDgwLDQ1IEw5MCw0MCIgZmlsbD0iI2JiYiIvPgogICAgPHBhdGggZD0iTTIyMCwzNSBMMjMwLDM1IEwyMzAsNDUgTDIyMCw0NSIgZmlsbD0iI2JiYiIvPgogIDwvZz4KICA8dGV4dCB4PSIxNjAiIHk9IjIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMzMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlBNLTg0IEdMQVVCRVJZVDwvdGV4dD4KPC9zdmc+" alt="Schematyczny rysunek pistoletu maszynowego PM-84 Glauberyt" style="max-width: 300px;">
+                    </div>`,
+                    description: "PM-84 Glauberyt to polski pistolet maszynowy opracowany jako następca PM-63 RAK. Charakteryzuje się zwiększoną niezawodnością i ergonomią. Wyposażony w tłumik płomieni i składaną kolbę. Używany przez jednostki specjalne oraz jako uzbrojenie załóg pojazdów."
+                },
+                p_wist: {
+                    name: "Pistolet WIST-94",
+                    caliber: "9 mm Parabellum",
+                    length: "200 mm",
+                    barrel_length: "115 mm",
+                    weight: "1,1 kg (z magazynkiem)",
+                    rate_of_fire: "ogień pojedynczy",
+                    magazine: "16 nabojów",
+                    effective_range: "do 50 m",
+                    image: `<div style="text-align: center; margin: 15px 0;">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxnIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIj4KICAgIDxwYXRoIGQ9Ik0xMDAsNDAgTDEyMCw0MCBMMTQwLDM1IEwxODAsMzUgTDE5MCw0MCBMMTkwLDUwIEwxODAsNTUgTDE0MCw1NSBMMTMwLDUwIEwxMjAsNTAgTDEwMCw0MCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8cGF0aCBkPSJNMTIwLDQwIEwxMjAsNTAiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogICAgPHBhdGggZD0iTTEzMCw1NSBMMTMwLDY1IEwxNTAsNjUgTDE1MCw1NSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPC9nPgogIDx0ZXh0IHg9IjE0MCIgeT0iMjAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzMzMyIgdGV4dC1hbmNob3I9Im1pZGRsZSI+V0lTVC05NDwvdGV4dD4KPC9zdmc+" alt="Schematyczny rysunek pistoletu WIST-94" style="max-width: 300px;">
+                    </div>`,
+                    description: "WIST-94 to polski pistolet samopowtarzalny opracowany dla Polskich Sił Zbrojnych i Policji. Charakteryzuje się mechanizmem spustowym podwójnego działania (DA/SA) i pojemnym magazynkiem. Wyposażony w zatrzask zamka i bezpiecznik nastawny."
+                }
+            };
             
-            // Clear previous data
-            ammoTableBody.innerHTML = '';
-            let totalAmmo = 0;
-            
-            // Calculate for each selected exercise
-            selectedExercises.forEach(exerciseId => {
-                const exercise = exercises[exerciseId];
-                const exerciseAmmo = exercise.ammo * total;
-                totalAmmo += exerciseAmmo;
+            // Funkcja obliczająca wyniki
+            function calculateResults() {
+                const total = parseInt(totalInput.value) || 0;
+                const veryGood = parseInt(veryGoodInput.value) || 0;
+                const good = parseInt(goodInput.value) || 0;
+                const satisfactory = parseInt(satisfactoryInput.value) || 0;
+                const unsatisfactory = parseInt(unsatisfactoryInput.value) || 0;
                 
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${exercise.name}</td>
-                    <td>${exercise.ammo}</td>
-                    <td>${total}</td>
-                    <td>${exerciseAmmo}</td>
-                `;
-                ammoTableBody.appendChild(row);
-            });
+                // Walidacja danych
+                if (veryGood + good + satisfactory + unsatisfactory > total) {
+                    alert("Suma poszczególnych ocen nie może przekraczać łącznej liczby strzelających!");
+                    return;
+                }
+                
+                // Obliczanie procentu wykonania
+                const positiveResults = veryGood + good + satisfactory;
+                const percentage = total > 0 ? (positiveResults / total * 100) : 0;
+                percentageOutput.value = percentage.toFixed(2) + "%";
+                
+                // Obliczanie średniej arytmetycznej
+                const sum = 5 * veryGood + 4 * good + 3 * satisfactory + 2 * unsatisfactory;
+                const mean = total > 0 ? (sum / total) : 0;
+                meanOutput.value = mean.toFixed(2);
+                
+                // Ustalenie oceny ogólnej
+                let overall = "Niedostateczna";
+                if (mean >= 4.51) {
+                    overall = "Bardzo dobra";
+                } else if (mean >= 3.51) {
+                    overall = "Dobra";
+                } else if (mean >= 2.51) {
+                    overall = "Dostateczna";
+                }
+                overallOutput.value = overall;
+            }
             
-            totalAmmoOutput.textContent = totalAmmo;
-            ammoCalculationDiv.classList.remove('hidden');
-        }
-        
-        // Show exercise details
-        function showExerciseDetails() {
-            const exerciseId = parseInt(shootingConditionsSelect.value);
-            if (exerciseId && exercises[exerciseId] && exercises[exerciseId].details) {
-                conditionsDetailsDiv.innerHTML = exercises[exerciseId].details;
-                conditionsDetailsDiv.classList.remove('hidden');
-            } else {
-                conditionsDetailsDiv.classList.add('hidden');
+            // Funkcja obliczająca zużycie amunicji
+            function calculateAmmoUsage() {
+                const total = parseInt(totalInput.value) || 0;
+                if (total === 0) {
+                    alert("Proszę wprowadzić liczbę strzelających!");
+                    return;
+                }
+                
+                const selectedExercises = Array.from(document.getElementById('shootingExercise').selectedOptions)
+                    .map(option => parseInt(option.value));
+                
+                if (selectedExercises.length === 0) {
+                    alert("Proszę wybrać co najmniej jedno ćwiczenie!");
+                    return;
+                }
+                
+                // Czyszczenie poprzednich danych
+                ammoTableBody.innerHTML = '';
+                let totalAmmo = 0;
+                
+                // Obliczanie dla każdego wybranego ćwiczenia
+                selectedExercises.forEach(exerciseId => {
+                    const exercise = exercises[exerciseId];
+                    const exerciseAmmo = exercise.ammo * total;
+                    totalAmmo += exerciseAmmo;
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${exercise.name}</td>
+                        <td>${exercise.ammo}</td>
+                        <td>${total}</td>
+                        <td>${exerciseAmmo}</td>
+                    `;
+                    ammoTableBody.appendChild(row);
+                });
+                
+                totalAmmoOutput.textContent = totalAmmo;
+                ammoCalculationDiv.classList.remove('hidden');
             }
-        }
-        
-        // Event listeners
-        totalInput.addEventListener('input', calculateResults);
-        veryGoodInput.addEventListener('input', calculateResults);
-        goodInput.addEventListener('input', calculateResults);
-        satisfactoryInput.addEventListener('input', calculateResults);
-        unsatisfactoryInput.addEventListener('input', calculateResults);
-        
-        showDetailsBtn.addEventListener('click', function() {
-            if (detailsDiv.classList.contains('hidden')) {
-                detailsDiv.classList.remove('hidden');
-                showDetailsBtn.textContent = 'Ukryj szczegóły';
-                showDetailsBtn.innerHTML = '<i class="fas fa-chevron-up"></i>Ukryj szczegóły';
-            } else {
-                detailsDiv.classList.add('hidden');
-                showDetailsBtn.innerHTML = '<i class="fas fa-chevron-down"></i>Pokaż szczegóły';
+            
+            // Funkcja pokazująca szczegóły ćwiczenia
+            function showExerciseDetails() {
+                const exerciseId = parseInt(shootingConditionsSelect.value);
+                if (exerciseId && exercises[exerciseId] && exercises[exerciseId].details) {
+                    conditionsDetailsDiv.innerHTML = exercises[exerciseId].details;
+                    conditionsDetailsDiv.classList.remove('hidden');
+                } else {
+                    conditionsDetailsDiv.classList.add('hidden');
+                }
             }
+            
+            // Funkcja pokazująca dane techniczne broni
+            function showWeaponDetails() {
+                const weaponId = weaponTypeSelect.value;
+                if (weaponId && weaponSpecs[weaponId]) {
+                    const weapon = weaponSpecs[weaponId];
+                    
+                    let content = `
+                        <div class="weapon-specs">
+                            <h4>${weapon.name}</h4>
+                            ${weapon.image || ''}
+                            <table>
+                                <tr>
+                                    <th>Kaliber</th>
+                                    <td>${weapon.caliber}</td>
+                                </tr>
+                                <tr>
+                                    <th>Długość</th>
+                                    <td>${weapon.length}</td>
+                                </tr>
+                                <tr>
+                                    <th>Długość lufy</th>
+                                    <td>${weapon.barrel_length}</td>
+                                </tr>
+                                <tr>
+                                    <th>Masa</th>
+                                    <td>${weapon.weight}</td>
+                                </tr>
+                                <tr>
+                                    <th>Szybkostrzelność</th>
+                                    <td>${weapon.rate_of_fire}</td>
+                                </tr>
+                                <tr>
+                                    <th>Magazynek</th>
+                                    <td>${weapon.magazine}</td>
+                                </tr>
+                                <tr>
+                                    <th>Zasięg efektywny</th>
+                                    <td>${weapon.effective_range}</td>
+                                </tr>
+                            </table>
+                            <p>${weapon.description}</p>`;
+                            
+                    if (weapon.extendedData) {
+                        content += weapon.extendedData;
+                    }
+                    
+                    content += `</div>`;
+                    
+                    weaponDataDiv.innerHTML = content;
+                    weaponDataDiv.classList.remove('hidden');
+                } else {
+                    weaponDataDiv.innerHTML = '';
+                    weaponDataDiv.classList.add('hidden');
+                }
+            }
+            
+            // Funkcja generująca PDF
+            function generatePdf() {
+                if (typeof window.jspdf === 'undefined' || typeof html2canvas === 'undefined') {
+                    alert("Funkcja generowania PDF nie jest dostępna. Biblioteki jsPDF lub html2canvas nie zostały załadowane.");
+                    return;
+                }
+                
+                // Tworzenie nagłówka dla PDF
+                const pdfHeader = document.createElement('div');
+                pdfHeader.innerHTML = `
+                    <h2 style="text-align: center; margin-bottom: 20px;">Zestawienie wyników strzeleckich</h2>
+                    <p style="text-align: center; margin-bottom: 30px;">Data: ${new Date().toLocaleDateString()}</p>
+                `;
+                
+                // Tworzenie tymczasowego kontenera na wszystkie wyniki
+                const tempContainer = document.createElement('div');
+                tempContainer.style.padding = '20px';
+                tempContainer.style.backgroundColor = 'white';
+                tempContainer.style.position = 'absolute';
+                tempContainer.style.left = '-9999px';
+                tempContainer.appendChild(pdfHeader);
+                
+                // Klonowanie wyników do PDF
+                const resultsArea = document.querySelector('.container').cloneNode(true);
+                
+                // Usuwanie niepotrzebnych elementów
+                const buttons = resultsArea.querySelectorAll('button');
+                buttons.forEach(btn => btn.remove());
+                
+                const hiddenSections = resultsArea.querySelectorAll('.details');
+                hiddenSections.forEach(section => section.remove());
+                
+                tempContainer.appendChild(resultsArea);
+                document.body.appendChild(tempContainer);
+                
+                // Tworzenie obrazu kontenera
+                html2canvas(tempContainer, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    
+                    // Inicjalizacja jsPDF
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    
+                    // Obliczanie wymiarów
+                    const imgWidth = 210 - 40; // Szerokość A4 - marginesy
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    
+                    // Dodawanie obrazu do PDF
+                    pdf.addImage(imgData, 'PNG', 20, 20, imgWidth, imgHeight);
+                    
+                    // Zapisywanie PDF
+                    pdf.save('zestawienie_wynikow_strzeleckich.pdf');
+                    
+                    // Usuwanie tymczasowego kontenera
+                    document.body.removeChild(tempContainer);
+                });
+            }
+            
+            const sightingBtn = document.getElementById('sightingBtn');
+            const sightingSection = document.getElementById('sightingSection');
+            
+            // Dodanie nasłuchiwacza dla przycisku zgrywania przyrządów
+            if (sightingBtn) {
+                sightingBtn.addEventListener('click', function() {
+                    if (sightingSection.classList.contains('hidden')) {
+                        sightingSection.classList.remove('hidden');
+                        this.innerHTML = '<i class="fas fa-eye"></i>Ukryj informacje o celowaniu';
+                        
+                        // Zamykanie innych sekcji
+                        if (detailsSection && !detailsSection.classList.contains('hidden')) {
+                            detailsSection.classList.add('hidden');
+                            showDetailsBtn.innerHTML = '<i class="fas fa-chevron-down"></i>Pokaż szczegóły';
+                        }
+                        if (technicalSection && !technicalSection.classList.contains('hidden')) {
+                            technicalSection.classList.add('hidden');
+                            techDetailsBtn.innerHTML = '<i class="fas fa-cogs"></i>Dane techniczno taktyczne';
+                        }
+                    } else {
+                        sightingSection.classList.add('hidden');
+                        this.innerHTML = '<i class="fas fa-eye"></i>Zgrywanie przyrządów';
+                    }
+                });
+            }
+            
+            // Dodanie nasłuchiwaczy zdarzeń
+            if (totalInput) totalInput.addEventListener('input', calculateResults);
+            if (veryGoodInput) veryGoodInput.addEventListener('input', calculateResults);
+            if (goodInput) goodInput.addEventListener('input', calculateResults);
+            if (satisfactoryInput) satisfactoryInput.addEventListener('input', calculateResults);
+            if (unsatisfactoryInput) unsatisfactoryInput.addEventListener('input', calculateResults);
+            
+            if (showDetailsBtn) {
+                showDetailsBtn.addEventListener('click', function() {
+                    if (detailsSection.classList.contains('hidden')) {
+                        detailsSection.classList.remove('hidden');
+                        this.innerHTML = '<i class="fas fa-chevron-up"></i>Ukryj szczegóły';
+                        
+                        // Zamykanie innych sekcji
+                        if (technicalSection && !technicalSection.classList.contains('hidden')) {
+                            technicalSection.classList.add('hidden');
+                            techDetailsBtn.innerHTML = '<i class="fas fa-cogs"></i>Dane techniczno taktyczne';
+                        }
+                        if (sightingSection && !sightingSection.classList.contains('hidden')) {
+                            sightingSection.classList.add('hidden');
+                            sightingBtn.innerHTML = '<i class="fas fa-eye"></i>Zgrywanie przyrządów';
+                        }
+                    } else {
+                        detailsSection.classList.add('hidden');
+                        this.innerHTML = '<i class="fas fa-chevron-down"></i>Pokaż szczegóły';
+                    }
+                });
+            }
+            
+            if (techDetailsBtn) {
+                techDetailsBtn.addEventListener('click', function() {
+                    if (technicalSection.classList.contains('hidden')) {
+                        technicalSection.classList.remove('hidden');
+                        this.innerHTML = '<i class="fas fa-chevron-up"></i>Ukryj dane techniczno taktyczne';
+                        
+                        // Zamykanie innych sekcji
+                        if (detailsSection && !detailsSection.classList.contains('hidden')) {
+                            detailsSection.classList.add('hidden');
+                            showDetailsBtn.innerHTML = '<i class="fas fa-chevron-down"></i>Pokaż szczegóły';
+                        }
+                        if (sightingSection && !sightingSection.classList.contains('hidden')) {
+                            sightingSection.classList.add('hidden');
+                            sightingBtn.innerHTML = '<i class="fas fa-eye"></i>Zgrywanie przyrządów';
+                        }
+                    } else {
+                        technicalSection.classList.add('hidden');
+                        this.innerHTML = '<i class="fas fa-cogs"></i>Dane techniczno taktyczne';
+                    }
+                });
+            }
+            
+            if (calculateAmmoBtn) calculateAmmoBtn.addEventListener('click', calculateAmmoUsage);
+            if (shootingConditionsSelect) shootingConditionsSelect.addEventListener('change', showExerciseDetails);
+            if (weaponTypeSelect) weaponTypeSelect.addEventListener('change', showWeaponDetails);
+            if (savePdfBtn) savePdfBtn.addEventListener('click', generatePdf);
         });
-        
-        calculateAmmoBtn.addEventListener('click', calculateAmmoUsage);
-        shootingConditionsSelect.addEventListener('change', showExerciseDetails);
-        
-        // Initialize calculations
-        calculateResults();
     </script>
 </body>
 </html>
