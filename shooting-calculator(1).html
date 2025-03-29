@@ -1,1412 +1,832 @@
-<!DOCTYPE html>
+            // Conditions form
+            const saveConditionsBtn = document.getElementById('save-conditions-btn');
+            const conditionsSaved = document.getElementById('conditions-saved');
+            
+            saveConditionsBtn.addEventListener('click', function() {
+                conditionsSaved.classList.remove('hidden');
+                setTimeout(() => {
+                    conditionsSaved.classList.add('hidden');
+                }, 3000);
+            });        .ammo-option-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }<!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Wyników Strzeleckich</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <title>Kalkulator Wyników Strzelań - PSBS Międzyrzecz</title>
     <style>
         :root {
-            --primary: #0c7cd5;
-            --primary-light: #2196f3;
-            --primary-dark: #0d47a1;
-            --accent: #00bcd4;
-            --text: #fff;
-            --dark-text: #333;
-            --background: #121212;
-            --card-bg: #1e1e1e;
-            --border-radius: 12px;
-            --shadow: 0 4px 20px rgba(0, 123, 255, 0.3);
-            --glow: 0 0 15px rgba(33, 150, 243, 0.7);
+            --primary-color: #3f51b5;
+            --secondary-color: #7986cb;
+            --background-color: #f5f5f5;
+            --text-color: #333;
+            --section-bg: #fff;
+            --border-color: #ddd;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
         }
-
+        
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
+        
         body {
-            background-color: var(--background);
-            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            padding-bottom: 80px;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            padding-bottom: 80px; /* Space for navigation */
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
+        
         header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
             text-align: center;
-            margin-bottom: 30px;
-            padding: 20px 0;
-            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-
-        header h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        
+        h1 {
+            font-size: 1.5rem;
+            margin: 0;
         }
-
-        .tab-section {
-            display: none;
-        }
-
-        .tab-section.active {
-            display: block;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            padding: 25px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(33, 150, 243, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            box-shadow: var(--glow);
-            transform: translateY(-5px);
-        }
-
-        .card-header {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-        }
-
-        .card-icon {
-            font-size: 2rem;
-            margin-right: 15px;
-            color: var(--primary-light);
-        }
-
+        
         h2 {
-            color: var(--primary-light);
-            font-size: 1.8rem;
-            font-weight: 600;
+            font-size: 1.3rem;
+            margin: 1rem 0;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
         }
-
-        h3 {
-            color: var(--accent);
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            font-weight: 500;
+        
+        section {
+            padding: 1rem;
+            margin: 1rem;
+            background-color: var(--section-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-
+        
         label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--primary-light);
+            margin: 0.5rem 0;
+            font-weight: bold;
         }
-
-        .icon-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .icon-label i {
-            color: var(--accent);
-        }
-
+        
         input, select {
             width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 20px;
-            border: none;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            color: var(--text);
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
             font-size: 1rem;
-            transition: all 0.3s;
-            border: 1px solid rgba(33, 150, 243, 0.2);
         }
-
-        input:focus, select:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px var(--primary-light);
-            background-color: rgba(255, 255, 255, 0.15);
-        }
-
+        
         button {
-            background: linear-gradient(to right, var(--primary-dark), var(--primary));
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 6px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 1rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-right: 10px;
-            margin-bottom: 10px;
+            width: 100%;
+            margin: 0.5rem 0;
         }
-
+        
         button:hover {
-            background: linear-gradient(to right, var(--primary), var(--accent));
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-            transform: translateY(-2px);
+            background-color: var(--secondary-color);
         }
-
-        button i {
-            margin-right: 8px;
+        
+        .ammo-option-btn {
+            background-color: #e0e0e0;
+            color: var(--text-color);
         }
-
-        .button-group {
-            display: flex;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
+        
+        .tab-btn {
+            background-color: #e0e0e0;
+            color: var(--text-color);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0 0.25rem;
         }
-
-        .result-box {
-            background-color: rgba(0, 123, 255, 0.1);
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 20px;
-            border-left: 4px solid var(--primary);
+        
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: white;
         }
-
+        
+        .tab-content {
+            margin-top: 1rem;
+        }
+        
+        .results {
+            background-color: #e8eaf6;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+        }
+        
         .result-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.25rem 0;
+            border-bottom: 1px solid var(--border-color);
         }
-
+        
         .result-item:last-child {
             border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
         }
-
-        .result-label {
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .result-label i {
-            color: var(--accent);
-        }
-
-        .result-value {
-            font-weight: 700;
-            color: var(--primary-light);
-        }
-
-        .collapsible {
-            cursor: pointer;
-            padding: 10px 15px;
-            width: 100%;
-            text-align: left;
-            background-color: rgba(0, 123, 255, 0.1);
-            border: none;
-            border-radius: 6px;
-            outline: none;
-            font-size: 1rem;
-            transition: 0.4s;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .collapsible:hover {
-            background-color: rgba(0, 123, 255, 0.2);
-        }
-
-        .collapsible:after {
-            content: '+';
-            color: var(--primary-light);
-            font-weight: bold;
-            float: right;
-            margin-left: 5px;
-        }
-
-        .active:after {
-            content: "-";
-        }
-
-        .content {
-            padding: 0 18px;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 0 0 6px 6px;
-        }
-
-        .content-padding {
-            padding: 15px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
-        }
-
-        .tabs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .tab-button {
-            background-color: rgba(0, 123, 255, 0.1);
-            border: 1px solid rgba(33, 150, 243, 0.2);
-            border-radius: 6px;
-            padding: 10px 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .tab-button i {
-            color: var(--accent);
-        }
-
-        .tab-button.active {
-            background-color: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .specs-grid {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 10px;
-            margin: 20px 0;
-        }
-
-        .specs-grid div:nth-child(odd) {
-            font-weight: 600;
-            color: var(--primary-light);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .specs-grid div:nth-child(odd) i {
-            color: var(--accent);
-        }
-
-        .mobile-menu {
+        
+        .nav-container {
             position: fixed;
             bottom: 0;
             left: 0;
-            right: 0;
-            background-color: var(--card-bg);
+            width: 100%;
+            background-color: var(--primary-color);
             display: flex;
             justify-content: space-around;
-            padding: 10px 0;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
-            z-index: 100;
-        }
-
-        .menu-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: var(--text);
-            text-decoration: none;
-            font-size: 0.8rem;
-            opacity: 0.7;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-
-        .menu-item i {
-            font-size: 1.5rem;
-            margin-bottom: 4px;
-        }
-
-        .menu-item.active, .menu-item:hover {
-            opacity: 1;
-            color: var(--primary-light);
-        }
-
-        .ammo-pattern {
-            display: flex;
-            flex-wrap: wrap;
-            margin-top: 10px;
-            gap: 10px;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
         }
         
-        .ammo-round {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+        .nav-button {
+            color: white;
+            text-decoration: none;
+            padding: 1rem 0;
+            text-align: center;
+            flex: 1;
+            font-size: 0.85rem;
+        }
+        
+        .nav-button:hover, .nav-button.active {
+            background-color: var(--secondary-color);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            text-align: left;
+        }
+        
+        th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .collapsible {
+            background-color: #e8eaf6;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+        }
+        
+        .details-button {
+            background-color: var(--secondary-color);
+        }
+        
+        .grade-very-good {
+            color: var(--success-color);
             font-weight: bold;
         }
         
-        .regular-ammo {
-            background-color: rgba(33, 150, 243, 0.3);
-            border: 2px solid var(--primary-light);
+        .grade-good {
+            color: var(--warning-color);
+            font-weight: bold;
         }
         
-        .tracer-ammo {
-            background-color: rgba(244, 67, 54, 0.3);
-            border: 2px solid #f44336;
-            color: #f44336;
+        .grade-satisfactory {
+            color: #ff9800;
+            font-weight: bold;
         }
-
-        @media (max-width: 768px) {
-            h2 {
-                font-size: 1.5rem;
-            }
-
-            .card {
-                padding: 20px;
-            }
-
-            .button-group {
-                flex-direction: column;
-            }
-
-            button {
-                width: 100%;
-                margin-right: 0;
-            }
-
-            .grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Animation */
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.7);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(33, 150, 243, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
-            }
-        }
-
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-
-        /* Loader */
-        .loader {
-            border: 4px solid rgba(33, 150, 243, 0.3);
-            border-radius: 50%;
-            border-top: 4px solid var(--primary-light);
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        
+        .grade-fail {
+            color: var(--danger-color);
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-bullseye" style="color: #ff9800;"></i> Kalkulator Wyników Strzeleckich</h1>
-        </header>
-
-        <section id="calculator" class="tab-section active card">
-            <div class="card-header">
-                <i class="fas fa-calculator card-icon" style="color: #4caf50;"></i>
-                <h2>Kalkulator Wyników</h2>
+    <header>
+        <h1>PSBS Międzyrzecz 2025 r.</h1>
+        <h2 style="color: white; border-bottom: none; padding-bottom: 0; margin: 0.5rem 0;">KALKULATOR WYNIKÓW STRZELAŃ</h2>
+    </header>
+    
+    <!-- Zestawienie wyników -->
+    <section id="results-summary" class="section">
+        <h2>Zestawienie wyników</h2>
+        <form id="results-form">
+            <label for="total-shooters">Liczba strzelających:</label>
+            <input type="number" id="total-shooters" required min="1">
+            
+            <label for="very-good">Bardzo dobrych:</label>
+            <input type="number" id="very-good" required min="0">
+            
+            <label for="good">Dobrych:</label>
+            <input type="number" id="good" required min="0">
+            
+            <label for="satisfactory">Dostatecznych:</label>
+            <input type="number" id="satisfactory" required min="0">
+            
+            <label for="fail">Niedostatecznych:</label>
+            <input type="number" id="fail" required min="0">
+            
+            <button type="button" id="calculate-btn">Oblicz wyniki</button>
+        </form>
+        
+        <div id="results-output" class="results hidden">
+            <div class="result-item">
+                <span>Strzelało:</span>
+                <span id="total-result">0</span>
+            </div>
+            <div class="result-item">
+                <span>Bardzo dobrych:</span>
+                <span id="very-good-result">0</span>
+            </div>
+            <div class="result-item">
+                <span>Dobrych:</span>
+                <span id="good-result">0</span>
+            </div>
+            <div class="result-item">
+                <span>Dostatecznych:</span>
+                <span id="satisfactory-result">0</span>
+            </div>
+            <div class="result-item">
+                <span>Niedostatecznych:</span>
+                <span id="fail-result">0</span>
+            </div>
+            <div class="result-item">
+                <span>Procent wykonania:</span>
+                <span id="percentage-result">0%</span>
+            </div>
+            <div class="result-item">
+                <span>Ocena średnia arytmetyczna:</span>
+                <span id="average-result">0.00</span>
+            </div>
+            <div class="result-item">
+                <span>Ocena ogólna:</span>
+                <span id="overall-result">-</span>
             </div>
             
-            <div>
-                <label class="icon-label" for="shooters"><i class="fas fa-users"></i> Liczba strzelających:</label>
-                <input type="number" id="shooters" min="0" value="0">
-                
-                <label class="icon-label" for="very-good"><i class="fas fa-medal" style="color: gold;"></i> Bardzo dobrych:</label>
-                <input type="number" id="very-good" min="0" value="0">
-                
-                <label class="icon-label" for="good"><i class="fas fa-thumbs-up" style="color: #4caf50;"></i> Dobrych:</label>
-                <input type="number" id="good" min="0" value="0">
-                
-                <label class="icon-label" for="satisfactory"><i class="fas fa-check" style="color: #2196f3;"></i> Dostatecznych:</label>
-                <input type="number" id="satisfactory" min="0" value="0">
-                
-                <label class="icon-label" for="unsatisfactory"><i class="fas fa-times" style="color: #f44336;"></i> Niedostatecznych:</label>
-                <input type="number" id="unsatisfactory" min="0" value="0">
-                
-                <button id="calculate-btn" onclick="calculateResults()">
-                    <i class="fas fa-calculator"></i>
-                    Oblicz wyniki
-                </button>
-                
-                <div id="results" class="result-box" style="display: none;">
-                    <h3><i class="fas fa-chart-pie" style="color: #e91e63;"></i> Zestawienie wyników:</h3>
-                    <div class="result-item">
-                        <span class="result-label"><i class="fas fa-users"></i> Strzelało:</span>
-                        <span class="result-value" id="result-shooters">0</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label"><i class="fas fa-medal" style="color: gold;"></i> Bardzo dobrych:</span>
-                        <span class="result-value" id="result-very-good">0</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label"><i class="fas fa-thumbs-up" style="color: #4caf50;"></i> Dobrych:</span>
-                        <span class="result-value" id="result-good">0</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label"><i class="fas fa-check" style="color: #2196f3;"></i> Dostatecznych:</span>
-                        <span class="result-value" id="result-satisfactory">0</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label"><i class="fas fa-times" style="color: #f44336;"></i> Niedostatecznych:</span>
-                        <span class="result-value" id="result-unsatisfactory">0</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label"><i class="fas fa-percent" style="color: #9c27b0;"></i> Procent wykonania:</span>
-                        <span class="result-value" id="result-percentage">0%</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label"><i class="fas fa-calculator" style="color: #ff5722;"></i> Ocena średnia arytmetyczna:</span>
-                        <span class="result-value" id="result-average">0.00</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label"><i class="fas fa-award" style="color: #ffeb3b;"></i> Ocena ogólna:</span>
-                        <span class="result-value" id="result-overall">Niedostateczna</span>
-                    </div>
-
-                    <button type="button" class="collapsible"><i class="fas fa-info-circle" style="margin-right: 10px;"></i> Pokaż szczegóły</button>
-                    <div class="content">
-                        <div class="content-padding" id="details-content">
-                            <p>Aby wyświetlić szczegółowe obliczenia, kliknij przycisk "Oblicz wyniki".</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="ammunition" class="tab-section card">
-            <div class="card-header">
-                <i class="fas fa-boxes card-icon" style="color: #ff9800;"></i>
-                <h2>Zużycie Amunicji</h2>
-            </div>
+            <button type="button" id="details-btn" class="details-button">Pokaż szczegóły</button>
             
-            <div>
-                <label class="icon-label" for="ammo-shooters"><i class="fas fa-users"></i> Liczba strzelających:</label>
-                <input type="number" id="ammo-shooters" min="0" value="0">
-                
-                <label class="icon-label" for="exercise-type"><i class="fas fa-list-ul" style="color: #9c27b0;"></i> Rodzaj strzelania:</label>
-                <select id="exercise-type">
-                    <option value="">Wybierz rodzaj strzelania</option>
-                    <option value="cp">1. ĆWICZENIE PRZYGOTOWAWCZE</option>
-                    <option value="ss">2. STRZELANIE SZKOLNE</option>
-                    <option value="sb">3. STRZELANIE BOJOWE</option>
-                    <option value="rgr">4. RZUCANIE GRANATAMI RĘCZNYMI</option>
-                    <option value="ss">5. STRZELANIE SYTUACYJNE</option>
-                </select>
-                
-                <label class="icon-label" for="specific-exercise"><i class="fas fa-bullseye" style="color: #e91e63;"></i> Konkretne ćwiczenie:</label>
-                <select id="specific-exercise" disabled>
-                    <option value="">Najpierw wybierz rodzaj strzelania</option>
-                </select>
-                
-                <div class="button-group">
-                    <button id="calculate-ammo-btn" onclick="calculateAmmo(false)">
-                        <i class="fas fa-calculator"></i>
-                        Oblicz zużycie amunicji (bez smugowej)
-                    </button>
-                    
-                    <button id="calculate-ammo-with-tracer-btn" onclick="calculateAmmo(true)" style="background: linear-gradient(to right, var(--primary-dark), #f44336);">
-                        <i class="fas fa-fire"></i>
-                        Oblicz zużycie amunicji (z smugową)
-                    </button>
-                </div>
-                
-                <div id="ammo-results" class="result-box" style="display: none;">
-                    <h3><i class="fas fa-boxes" style="color: #ff9800;"></i> Zużycie amunicji:</h3>
-                    <div class="result-item">
-                        <span class="result-label"><i class="fas fa-users"></i> Liczba strzelających:</span>
-                        <span class="result-value" id="ammo-result-shooters">0</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label"><i class="fas fa-clipboard-list" style="color: #4caf50;"></i> Ćwiczenie:</span>
-                        <span class="result-value" id="ammo-result-exercise"></span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label"><i class="fas fa-user-shield" style="color: #2196f3;"></i> Amunicja na osobę:</span>
-                        <span class="result-value" id="ammo-per-person">0</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label"><i class="fas fa-boxes" style="color: #ff9800;"></i> Całkowite zużycie amunicji:</span>
-                        <span class="result-value" id="ammo-total">0</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label"><i class="fas fa-box" style="color: #9e9e9e;"></i> Amunicja zwykła:</span>
-                        <span class="result-value" id="ammo-regular">0</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label"><i class="fas fa-fire" style="color: #f44336;"></i> Amunicja smugowa:</span>
-                        <span class="result-value" id="ammo-tracer">0</span>
-                    </div>
-                    
-                    <!-- Nowy element do wyświetlania wzorca rozmieszczenia amunicji -->
-                    <div class="result-item" id="tracer-pattern-container" style="display: none; flex-direction: column; align-items: flex-start;">
-                        <div class="result-label" style="margin-bottom: 10px;"><i class="fas fa-list-ol" style="color: #9c27b0;"></i> Rozmieszczenie amunicji:</div>
-                        <div id="ammo-pattern" class="ammo-pattern"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="conditions" class="tab-section card">
-            <div class="card-header">
-                <i class="fas fa-crosshairs card-icon" style="color: #f44336;"></i>
-                <h2>Warunki Strzelania</h2>
-            </div>
-            
-            <div>
-                <label class="icon-label" for="shooting-category"><i class="fas fa-folder-open" style="color: #9c27b0;"></i> Kategoria strzelania:</label>
-                <select id="shooting-category" onchange="updateExercises()">
-                    <option value="">Wybierz kategorię</option>
-                    <option value="preparatory">1. ĆWICZENIE PRZYGOTOWAWCZE</option>
-                    <option value="school">2. STRZELANIE SZKOLNE</option>
-                    <option value="combat">3. STRZELANIE BOJOWE</option>
-                    <option value="grenade">4. RZUCANIE GRANATAMI RĘCZNYMI</option>
-                    <option value="situational">5. STRZELANIE SYTUACYJNE</option>
-                </select>
-                
-                <label class="icon-label" for="exercise-select"><i class="fas fa-tasks" style="color: #4caf50;"></i> Ćwiczenie:</label>
-                <select id="exercise-select" onchange="showExerciseDetails()" disabled>
-                    <option value="">Najpierw wybierz kategorię</option>
-                </select>
-                
-                <div id="exercise-details" class="result-box" style="display: none;">
-                    <h3 id="exercise-title"><i class="fas fa-info-circle" style="color: #2196f3; margin-right: 10px;"></i> Szczegóły ćwiczenia</h3>
-                    <div id="exercise-content">
-                        <p>Wybierz ćwiczenie, aby zobaczyć szczegóły.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="specifications" class="tab-section card">
-            <div class="card-header">
-                <i class="fas fa-info-circle card-icon" style="color: #2196f3;"></i>
-                <h2>Dane Taktyczno-Techniczne</h2>
-            </div>
-            
-            <div class="tabs">
-                <button class="tab-button active" onclick="openTab(event, 'beryl')"><i class="fas fa-gun"></i> BERYL</button>
-                <button class="tab-button" onclick="openTab(event, 'ukm')"><i class="fas fa-gun"></i> UKM</button>
-                <button class="tab-button" onclick="openTab(event, 'vis100')"><i class="fas fa-gun"></i> VIS 100</button>
-                <button class="tab-button" onclick="openTab(event, 'grot')"><i class="fas fa-gun"></i> MSBS GROT</button>
-            </div>
-            
-            <div id="beryl" class="tab-content active">
-                <h3><i class="fas fa-gun" style="color: #4caf50; margin-right: 10px;"></i> Dane taktyczno-techniczne karabinka szturmowego wz. 96 Beryl</h3>
-                <div class="specs-grid">
-                    <div><i class="fas fa-bullseye"></i> Amunicja</div>
-                    <div>5,56 x 45 mm NATO</div>
-                    <div><i class="fas fa-tachometer-alt"></i> Prędkość wylotowa dla pocisku SS109</div>
-                    <div>V0 = 920 m/s</div>
-                    <div><i class="fas fa-bolt"></i> Energia wylotowa dla pocisku SS109</div>
-                    <div>E0 = 1690 J</div>
-                    <div><i class="fas fa-fire"></i> Rodzaj ognia</div>
-                    <div>pojedynczy, seria 3-strzałowa, ciągły</div>
-                    <div><i class="fas fa-fast-forward"></i> Szybkostrzelność teoretyczna</div>
-                    <div>700 strz./min.</div>
-                    <div><i class="fas fa-crosshairs"></i> Donośność skuteczna</div>
-                    <div>600 m</div>
-                    <div><i class="fas fa-eye"></i> Zakres nastaw celownika</div>
-                    <div>100 - 1000 m</div>
-                    <div><i class="fas fa-box"></i> Pojemność magazynka</div>
-                    <div>30 naboi</div>
-                    <div><i class="fas fa-cogs"></i> Zasada działania</div>
-                    <div>odprowadzanie gazów przez boczny otwór w lufie</div>
-                    <div><i class="fas fa-circle-notch"></i> Liczba bruzd w lufie</div>
-                    <div>6</div>
-                    <div><i class="fas fa-sync"></i> Skok gwintu lufy</div>
-                    <div>228 mm</div>
-                    <div><i class="fas fa-ruler-horizontal"></i> Długość z kolbą rozłożoną</div>
-                    <div>980 mm</div>
-                    <div><i class="fas fa-compress-arrows-alt"></i> Długość z kolbą złożoną</div>
-                    <div>910 mm</div>
-                    <div><i class="fas fa-ruler"></i> Długość lufy</div>
-                    <div>457 mm</div>
-                    <div><i class="fas fa-arrows-alt-h"></i> Długość linii celowniczej</div>
-                    <div>372 mm</div>
-                    <div><i class="fas fa-weight-hanging"></i> Karabin bez magazynka</div>
-                    <div>ok. 3650 g</div>
-                    <div><i class="fas fa-weight"></i> Magazynek 30-nabojowy pusty</div>
-                    <div>ok. 185 g</div>
-                    <div><i class="fas fa-balance-scale"></i> Magazynek 30-nabojowy załadowany</div>
-                    <div>ok. 554 g</div>
-                </div>
-            </div>
-            
-            <div id="ukm" class="tab-content">
-                <h3><i class="fas fa-gun" style="color: #ff9800; margin-right: 10px;"></i> Dane taktyczno-techniczne UKM</h3>
-                <p>Dane techniczne zostaną dodane wkrótce.</p>
-            </div>
-            
-            <div id="vis100" class="tab-content">
-                <h3><i class="fas fa-gun" style="color: #e91e63; margin-right: 10px;"></i> Dane taktyczno-techniczne VIS 100</h3>
-                <p>Dane techniczne zostaną dodane wkrótce.</p>
-            </div>
-            
-            <div id="grot" class="tab-content">
-                <h3><i class="fas fa-gun" style="color: #4caf50; margin-right: 10px;"></i> Funkcjonalność i cechy karabinów MSBS GROT</h3>
-                <ul style="list-style-type: none; padding-left: 0;">
-                    <li><i class="fas fa-check" style="color: #4caf50; margin-right: 8px;"></i> Ryflowana lufa o długości 16 cali</li>
-                    <li><i class="fas fa-check" style="color: #4caf50; margin-right: 8px;"></i> Ergonomiczna konstrukcja z obustronnymi manipulatorami</li>
-                    <li><i class="fas fa-check" style="color: #4caf50; margin-right: 8px;"></i> Możliwość łatwego ustawienia wyrzutnika łusek na lewą lub prawą stronę</li>
-                    <li><i class="fas fa-check" style="color: #4caf50; margin-right: 8px;"></i> Zmodyfikowany system gazowy z krótkim skokiem tłoka</li>
-                    <li><i class="fas fa-check" style="color: #4caf50; margin-right: 8px;"></i> Regulator gazowy typu otwartego</li>
-                    <li><i class="fas fa-check" style="color: #4caf50; margin-right: 8px;"></i> Modułowe łoże w systemie M-LOK</li>
-                    <li><i class="fas fa-check" style="color: #4caf50; margin-right: 8px;"></i> Górna szyna Picatinny</li>
-                    <li><i class="fas fa-check" style="color: #4caf50; margin-right: 8px;"></i> Składana, teleskopowa kolba</li>
-                    <li><i class="fas fa-check" style="color: #4caf50; margin-right: 8px;"></i> Tłumik płomienia z przeciwnakrętką</li>
+            <div id="calculation-details" class="collapsible hidden">
+                <h3>Szczegółowe obliczenia</h3>
+                <p>Ocenę wyszkolenia strzeleckiego ze strzelań szkolnych i bojowych ustala się na podstawie średniej arytmetycznej określonej z dokładnością do jednej setnej w następujący sposób:</p>
+                <ul>
+                    <li>"bardzo dobra" (bdb) - średnia arytmetyczna wynosi co najmniej 4,51</li>
+                    <li>"dobra" (db) - średnia arytmetyczna wynosi co najmniej 3,51</li>
+                    <li>"dostateczna" (dst) - średnia arytmetyczna wynosi co najmniej 2,51</li>
                 </ul>
                 
-                <h3><i class="fas fa-clipboard-list" style="color: #2196f3; margin-right: 10px;"></i> Cechy produktu</h3>
-                <div class="specs-grid">
-                    <div><i class="fas fa-bullseye"></i> Kaliber</div>
-                    <div>5.56x45mm / .223REM</div>
-                    <div><i class="fas fa-ruler-horizontal"></i> Długość całkowita</div>
-                    <div>865 - 924 mm</div>
-                    <div><i class="fas fa-compress-arrows-alt"></i> Długość ze złożoną kolbą</div>
-                    <div>700 mm</div>
-                    <div><i class="fas fa-arrows-alt-h"></i> Szerokość</div>
-                    <div>39 mm (z rączkami napinacza 86 mm)</div>
-                    <div><i class="fas fa-arrows-alt-v"></i> Wysokość</div>
-                    <div>206 mm</div>
-                    <div><i class="fas fa-ruler"></i> Długość lufy</div>
-                    <div>406 mm (16 cali)</div>
-                    <div><i class="fas fa-ruler-combined"></i> Długość łoża</div>
-                    <div>230 mm</div>
-                    <div><i class="fas fa-weight-hanging"></i> Waga</div>
-                    <div>3700 g</div>
-                    <div><i class="fas fa-box"></i> Pojemność magazynka</div>
-                    <div>10 sztuk</div>
-                    <div><i class="fas fa-circle-notch"></i> Typ lufy</div>
-                    <div>Gwintowana 6-krotna, prawoskrętny, 178mm</div>
-                    <div><i class="fas fa-cogs"></i> System gazowy</div>
-                    <div>Tłokowy</div>
-                    <div><i class="fas fa-tools"></i> Łoże</div>
-                    <div>Modułowe, w systemie M-LOK</div>
-                    <div><i class="fas fa-chair"></i> Kolba</div>
-                    <div>Polimerowa, regulowana</div>
+                <div id="detailed-calculations">
+                    <!-- Detailed calculations will be inserted here -->
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
+
+    <!-- Zużycie amunicji -->
+    <section id="ammo-usage" class="section hidden">
+        <h2>Zużycie amunicji</h2>
+        <form id="ammo-form">
+            <label for="ammo-type">Rodzaj amunicji:</label>
+            <select id="ammo-type">
+                <option value="9x18">9×18 mm Makarowa (1,38 zł/szt.)</option>
+                <option value="9x19">9×19 mm Parabellum (1,15 zł/szt.)</option>
+                <option value="5.56">5,56×45 mm NATO (2,50 zł/szt.)</option>
+                <option value="7.62">7.62×51 mm NATO (3,45 zł/szt.)</option>
+            </select>
+            
+            <label for="shooters-count">Liczba strzelców:</label>
+            <input type="number" id="shooters-count" min="1" required>
+            
+            <label for="shots-per-shooter">Liczba strzałów na strzelca:</label>
+            <input type="number" id="shots-per-shooter" min="1" required>
+            
+            <label for="ammo-option">Wybierz rodzaj amunicji:</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button type="button" id="regular-ammo-btn" class="ammo-option-btn active" style="flex: 1;">Amunicja zwykła</button>
+                <button type="button" id="tracer-ammo-btn" class="ammo-option-btn" style="flex: 1;">Amunicja smugowa (1:3)</button>
+            </div>
+            
+            <button type="button" id="calculate-ammo-btn">Oblicz zużycie</button>
+        </form>
+        
+        <div id="ammo-results" class="results hidden">
+            <h3>Wyniki kalkulacji</h3>
+            <div class="result-item">
+                <span>Rodzaj amunicji:</span>
+                <span id="ammo-type-result">-</span>
+            </div>
+            <div class="result-item">
+                <span>Liczba strzelających:</span>
+                <span id="shooters-result">0</span>
+            </div>
+            <div class="result-item">
+                <span>Amunicja na osobę:</span>
+                <span id="ammo-per-person-result">0 szt.</span>
+            </div>
+            <div class="result-item">
+                <span>Całkowita ilość amunicji:</span>
+                <span id="total-ammo-result">0 szt.</span>
+            </div>
+            <div id="ammo-breakdown" class="hidden">
+                <div class="result-item">
+                    <span>Amunicja zwykła:</span>
+                    <span id="regular-ammo-result">0 szt.</span>
+                </div>
+                <div class="result-item">
+                    <span>Amunicja smugowa:</span>
+                    <span id="tracer-ammo-result">0 szt.</span>
+                </div>
+            </div>
+            <div class="result-item">
+                <span>Koszt całkowity:</span>
+                <span id="total-cost-result">0.00 zł</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Warunki strzelania -->
+    <section id="shooting-conditions" class="section hidden">
+        <h2>Warunki strzelania</h2>
+        <div class="conditions-tabs" style="display: flex; margin-bottom: 15px;">
+            <button type="button" id="weather-tab-btn" class="tab-btn active" style="flex: 1;">Warunki pogodowe</button>
+            <button type="button" id="collimator-tab-btn" class="tab-btn" style="flex: 1;">Wizowanie kolimatora</button>
+        </div>
+        
+        <div id="weather-conditions" class="tab-content">
+            <form id="conditions-form">
+                <label for="weather">Warunki pogodowe:</label>
+                <select id="weather">
+                    <option value="sunny">Słonecznie</option>
+                    <option value="cloudy">Pochmurno</option>
+                    <option value="rainy">Deszczowo</option>
+                    <option value="windy">Wietrznie</option>
+                    <option value="foggy">Mgliście</option>
+                </select>
+                
+                <label for="temperature">Temperatura (°C):</label>
+                <input type="number" id="temperature" min="-30" max="50" value="20">
+                
+                <label for="wind-speed">Prędkość wiatru (km/h):</label>
+                <input type="number" id="wind-speed" min="0" max="100" value="5">
+                
+                <label for="wind-direction">Kierunek wiatru:</label>
+                <select id="wind-direction">
+                    <option value="N">Północny</option>
+                    <option value="NE">Północno-wschodni</option>
+                    <option value="E">Wschodni</option>
+                    <option value="SE">Południowo-wschodni</option>
+                    <option value="S">Południowy</option>
+                    <option value="SW">Południowo-zachodni</option>
+                    <option value="W">Zachodni</option>
+                    <option value="NW">Północno-zachodni</option>
+                </select>
+                
+                <label for="visibility">Widoczność (m):</label>
+                <input type="number" id="visibility" min="100" max="10000" value="1000">
+                
+                <button type="button" id="save-conditions-btn">Zapisz warunki</button>
+            </form>
+            
+            <div id="conditions-saved" class="results hidden">
+                <p>Warunki strzelania zostały zapisane.</p>
+            </div>
+        </div>
+        
+        <div id="collimator-settings" class="tab-content hidden">
+            <h3>Wizowanie kolimatora</h3>
+            <div class="collimator-info">
+                <p>Poniżej znajduje się instrukcja wizowania kolimatora oraz kalkulator przesunięcia punktu trafienia.</p>
+            </div>
+            
+            <div class="collimator-adjustment">
+                <h4>Kalkulator przesunięcia</h4>
+                <form id="collimator-form">
+                    <label for="distance">Dystans zerowania (m):</label>
+                    <input type="number" id="distance" min="25" max="500" value="100">
+                    
+                    <label for="current-x">Obecne przesunięcie w poziomie (cm):</label>
+                    <input type="number" id="current-x" value="0">
+                    
+                    <label for="current-y">Obecne przesunięcie w pionie (cm):</label>
+                    <input type="number" id="current-y" value="0">
+                    
+                    <label for="clicks-per-moa">Liczba kliknięć na 1 MOA:</label>
+                    <select id="clicks-per-moa">
+                        <option value="1">1 kliknięcie na MOA</option>
+                        <option value="2">2 kliknięcia na MOA</option>
+                        <option value="4" selected>4 kliknięcia na MOA</option>
+                        <option value="8">8 kliknięć na MOA</option>
+                    </select>
+                    
+                    <button type="button" id="calculate-adjustment-btn">Oblicz korektę</button>
+                </form>
+                
+                <div id="adjustment-results" class="results hidden">
+                    <h4>Wymagana korekta:</h4>
+                    <div class="result-item">
+                        <span>W poziomie:</span>
+                        <span id="horizontal-clicks">0 kliknięć</span>
+                    </div>
+                    <div class="result-item">
+                        <span>W pionie:</span>
+                        <span id="vertical-clicks">0 kliknięć</span>
+                    </div>
+                    <div class="collimator-instruction">
+                        <p id="adjustment-instruction">Obróć pokrętło kolimatora zgodnie z powyższymi wskazówkami, aby skorygować punkty trafienia.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="collimator-guide">
+                <h4>Procedura wizowania kolimatora</h4>
+                <ol>
+                    <li>Upewnij się, że broń jest rozładowana i bezpieczna.</li>
+                    <li>Stabilnie zamocuj broń w statywie lub worku strzeleckim.</li>
+                    <li>Ustaw tarczę na wybranym dystansie zerowania (zazwyczaj 25, 50 lub 100 metrów).</li>
+                    <li>Oddaj co najmniej 3 strzały, celując w środek tarczy.</li>
+                    <li>Zmierz odchylenie średniego punktu trafienia od środka tarczy (w poziomie i pionie).</li>
+                    <li>Wprowadź wartości do kalkulatora powyżej, aby obliczyć wymaganą liczbę kliknięć.</li>
+                    <li>Dokonaj korekty według wskazań kalkulatora.</li>
+                    <li>Oddaj kolejną grupę strzałów, aby sprawdzić skuteczność korekty.</li>
+                    <li>W razie potrzeby powtórz proces.</li>
+                </ol>
+            </div>
+            
+            <div class="collimator-tips">
+                <h4>Wskazówki</h4>
+                <ul>
+                    <li>Zawsze wizuj kolimator w takich samych warunkach, w jakich będziesz strzelać.</li>
+                    <li>Pamiętaj, że 1 MOA to około 2,9 cm na 100 metrach.</li>
+                    <li>Kierunek obrotu pokrętła: "w prawo" oznacza zgodnie z ruchem wskazówek zegara.</li>
+                    <li>Większość kolimatorów posiada oznaczenia U (up), D (down), L (left), R (right) wskazujące kierunek przemieszczenia punktu trafienia.</li>
+                    <li>Sprawdź w instrukcji kolimatora dokładną wartość MOA dla pojedynczego kliknięcia.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dane taktyczno-techniczne -->
+    <section id="technical-data" class="section hidden">
+        <h2>Dane taktyczno-techniczne</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rodzaj broni</th>
+                    <th>Kaliber</th>
+                    <th>Masa (bez magazynka)</th>
+                    <th>Pojemność magazynka</th>
+                    <th>Zasięg skuteczny</th>
+                    <th>Mechanizm</th>
+                    <th>Prędkość wylotowa</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>MSBS Grot (C16 FB-M2)</td>
+                    <td>5,56×45 mm NATO</td>
+                    <td>3,6 kg</td>
+                    <td>30</td>
+                    <td>400-600 m</td>
+                    <td>Automatyczny</td>
+                    <td>870 m/s</td>
+                </tr>
+                <tr>
+                    <td>VIS 100</td>
+                    <td>9×19 mm Parabellum</td>
+                    <td>0,73 kg</td>
+                    <td>15</td>
+                    <td>50 m</td>
+                    <td>Samopowtarzalny</td>
+                    <td>360 m/s</td>
+                </tr>
+                <tr>
+                    <td>PW WIST-94</td>
+                    <td>9×19 mm Parabellum</td>
+                    <td>0,72 kg</td>
+                    <td>16</td>
+                    <td>50 m</td>
+                    <td>Samopowtarzalny</td>
+                    <td>360 m/s</td>
+                </tr>
+                <tr>
+                    <td>UKM-2000P</td>
+                    <td>7,62×51 mm NATO</td>
+                    <td>8,4 kg</td>
+                    <td>100 (taśma)</td>
+                    <td>1000 m</td>
+                    <td>Automatyczny</td>
+                    <td>840 m/s</td>
+                </tr>
+                <tr>
+                    <td>PW-83</td>
+                    <td>9×18 mm Makarov</td>
+                    <td>0,73 kg</td>
+                    <td>8</td>
+                    <td>50 m</td>
+                    <td>Samopowtarzalny</td>
+                    <td>315 m/s</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Navigation -->
+    <div class="nav-container">
+        <a href="#results-summary" class="nav-button active" data-section="results-summary">Kalkulator wyników</a>
+        <a href="#ammo-usage" class="nav-button" data-section="ammo-usage">Zużycie amunicji</a>
+        <a href="#shooting-conditions" class="nav-button" data-section="shooting-conditions">Warunki strzelania</a>
+        <a href="#technical-data" class="nav-button" data-section="technical-data">Dane techniczne</a>
     </div>
 
-    <nav class="mobile-menu">
-        <div class="menu-item active" onclick="switchTab('calculator', this)">
-            <i class="fas fa-calculator" style="color: #4caf50;"></i>
-            <span>Kalkulator</span>
-        </div>
-        <div class="menu-item" onclick="switchTab('ammunition', this)">
-            <i class="fas fa-boxes" style="color: #ff9800;"></i>
-            <span>Amunicja</span>
-        </div>
-        <div class="menu-item" onclick="switchTab('conditions', this)">
-            <i class="fas fa-crosshairs" style="color: #f44336;"></i>
-            <span>Warunki</span>
-        </div>
-        <div class="menu-item" onclick="switchTab('specifications', this)">
-            <i class="fas fa-info-circle" style="color: #2196f3;"></i>
-            <span>Dane tech.</span>
-        </div>
-    </nav>
-
     <script>
-        // Definicje ćwiczeń
-        const exercisesData = {
-            preparatory: [
-                {
-                    id: "cp1",
-                    title: "ĆP z karabinka do pełnienia służby wartowniczej",
-                    details: {
-                        cele: "nr 1 - 2 x figura bojowa nr 40 (biegnący) ukazuje i ukrywa się na komendę kierownika strzelania; nr 2 - figura bojowa nr 23 (popiersie); nr 3 - figura bojowa nr 30 (klęczący); Cele nr 2 i 3 ukazują się jednocześnie na 25 sekund po 10 sekundach od ukrycia się celu nr 1.",
-                        odleglosc: "nr 1 - 150 m; nr 2 - 75 m; nr 3 - 100 m.",
-                        naboje: "6 szt.",
-                        czas: "ograniczony ukazywaniem się celów.",
-                        postawa: "nr 1 - stojąca; nr 2 i 3 - klęcząca za ukryciem.",
-                        rodzaj_ognia: "ogień pojedynczy.",
-                        ocena: "\"bardzo dobrze\" - trafić dwa cele; \"dobrze\" - trafić cel nr 2; \"dostatecznie\" - trafić cel nr 3.",
-                        warunki: "dzień, noc."
-                    },
-                    ammo: 6
-                },
-                {
-                    id: "cp2",
-                    title: "ĆP z karabinka Mini Beryl do pełnienia służby wartowniczej",
-                    details: {
-                        cele: "nr 1 - 2 x figura bojowa nr 40 (biegnący) ukazuje i ukrywa się na komendę kierownika strzelania; nr 2 - figura bojowa nr 23 (popiersie); nr 3 - figura bojowa nr 30 (klęczący). Cele nr 2 i 3 ukazują się jednocześnie na 25 sekund po 10 sekundach od ukrycia się celu nr 1.",
-                        odleglosc: "nr 1 - 150 m; nr 2 - 50 m; nr 3 - 75 m.",
-                        naboje: "6 szt. (w pistoletach, które nie mają przełącznika rodzaju ognia - 12 szt.).",
-                        czas: "ograniczony ukazywaniem się celów.",
-                        postawa: "nr 1 - stojąca; nr 2 i 3 - klęcząca za ukryciem.",
-                        rodzaj_ognia: "ogień pojedynczy (w pistoletach, które nie mają przełącznika rodzaju ognia - krótkimi seriami).",
-                        ocena: "\"bardzo dobrze\" - trafić dwa cele; \"dobrze\" - trafić cel nr 2; \"dostatecznie\" - trafić cel nr 3.",
-                        warunki: "dzień, noc."
-                    },
-                    ammo: 6
-                },
-                {
-                    id: "cp3",
-                    title: "ĆP z pistoletu maszynowego do pełnienia służby wartowniczej",
-                    details: {
-                        cele: "nr 1 - figura bojowa nr TS-10 ukazuje się dwa razy; pierwsze ukazanie - na 20 sekund; drugie ukazanie na 10 sekund, bezpośrednio po trafieniu lub ukryciu się celu nr 2; nr 2 - figura bojowa TS-10, ukazuje się na 10 sekund, po 5 sekundach od trafienia lub ukryciu się celu nr 1 po jego pierwszym ukazaniu; nr 3 - figura bojowa nr TS-10, ukazuje się na 10 sekund, cel ukazuje się bezpośrednio po trafieniu lub ukryciu się celu nr 1 po jego drugim ukazaniu.",
-                        odleglosc: "nr 1 i 2 - 40-50 m; nr 3 - 20-25 m.",
-                        naboje: "5 szt.",
-                        czas: "ograniczony ukazywaniem się celów.",
-                        postawa: "dowolna (według decyzji strzelającego).",
-                        rodzaj_ognia: "ogień pojedynczy.",
-                        ocena: "\"bardzo dobrze\" - trafić trzy cele; \"dobrze\" - trafić dwa cele; \"dostatecznie\" - trafić jeden cel.",
-                        warunki: "dzień."
-                    },
-                    ammo: 5
-                }
-            ],
-            school: [
-                {
-                    id: "ss1",
-                    title: "SSz Nr 1 Tor - strzelanie na celność i skupienie",
-                    details: {
-                        cele: "2 tarcze 23p na ekranie 1x1,5 m lub na 2 ekranach 0,75x0,75 m.",
-                        odleglosc: "400, 600, 800m (300m sprawdzenie przystrzelenia).",
-                        naboje: "40 szt. - 10 szt. na każdą odległość, 10 szt. na sprawdzenie przystrzelenia; Amunicja 12,7x99 o ulepszonym skupieniu.",
-                        czas: "10 minut - sprawdzenie przystrzelenia broni - 300m. 30 minut - 10 minut na każdą odległość.",
-                        postawa: "leżąca z podpórką, leżąca z dwójnogiem.",
-                        ocena: "\"bdb\" - uzyskać wymagane skupienie i minimum 48 punktów na 400 m, \"db\" - uzyskać wymagane skupienia i minimum 44 punkty, \"dst\" - uzyskać wymagane skupienia.",
-                        warunki: "dzień, wiatr do 6m/s."
-                    },
-                    ammo: 40
-                },
-                {
-                    id: "ss2",
-                    title: "SSz Nr 1 z karabinu wyborowego SWD - strzelanie na celność",
-                    details: {
-                        cele: "3 x obserwator (3 x figura bojowa nr 20), z których każdy ukazuje się raz na 20 sekund z przerwami 20-to sekundowymi.",
-                        odleglosc: "200-300 m.",
-                        naboje: "6 szt.",
-                        czas: "ograniczony ukazywaniem się celów.",
-                        postawa: "dowolna ze zmianą SO.",
-                        rodzaj_ognia: "pojedynczy.",
-                        ocena: "\"bardzo dobrze\" - trafić trzy cele; \"dobrze\" - trafić dwa cele; \"dostatecznie\" - trafić cel.",
-                        warunki: "dzień, noc, w maskach."
-                    },
-                    ammo: 6
-                },
-                {
-                    id: "ss3",
-                    title: "SSz Nr 1 - strzelanie w postawie siedzącej z 40 mm granatnika MK-19",
-                    details: {
-                        cele: "Grupa piechoty: 4 x biegnący (4 x figura bojowa nr 40) rozmieszczony w środku pola prostokąta o szerokości 10 m i głębokości 20 m.",
-                        odleglosc: "400-450 m.",
-                        naboje: "6 szt.",
-                        czas: "nieograniczony.",
-                        postawa: "siedząca.",
-                        rodzaj_ognia: "pojedynczy.",
-                        ocena: "\"bardzo dobrze\" - trafić w pole cztery razy, \"dobrze\" - trafić w pole 3 razy, \"dostatecznie\" - trafić w pole.",
-                        warunki: "dzień."
-                    },
-                    ammo: 6
-                },
-                {
-                    id: "ss4",
-                    title: "SSz Nr 2 - strzelanie w postawie siedzącej z 40 mm granatnika MK-19",
-                    details: {
-                        cele: "Moździerz z obsługą (figura bojowa nr 34)",
-                        odleglosc: "600 m.",
-                        naboje: "6 szt.",
-                        czas: "nieograniczony.",
-                        postawa: "siedząca.",
-                        rodzaj_ognia: "wg decyzji strzelającego.",
-                        ocena: "\"bardzo dobrze\" - trafić cel trzy razy, \"dobrze\" - trafić cel dwa razy, \"dostatecznie\" - trafić cel raz.",
-                        warunki: "dzień, noc."
-                    },
-                    ammo: 6
-                },
-                {
-                     id: "ss5",
-                    title: "SS S5 - strzelanie na krótkich odległościach z karabinka / pistoletu maszynowego",
-                    details: {
-                        cele: "nr 1 - popiersie (figura bojowa nr 23), ukazująca się na 15 sekund; nr 2 - klęczący (figura bojowa nr 30), ukazujący się na 15 sekund, cel ukazuje się po 5 sekundach od trafienia lub ukrycia się celu nr 1; nr 3 - popiersie z granatem (figura bojowa 23g), ukazująca się na 15 sekund, cel ukazuje się po 15 sekundach od trafienia lub ukrycia się celu nr 2; nr 4 - pancerzownica (figura bojowa nr 31), ukazująca się na 15 sekund, cel ukazuje się po 5 sekundach od trafienia lub ukrycia się celu nr 3.",
-                        odleglosc: "nr 1 i 3 - 20-40 m; nr 2 i 4 - 40-60 m.",
-                        naboje: "20 szt.",
-                        czas: "ograniczony czasem ukazywania się celów.",
-                        postawa: "nr 1 i 2 - klęcząca; nr 3 i 4 - leżąca.",
-                        rodzaj_ognia: "według decyzji strzelającego.",
-                        ocena: "\"bardzo dobrze\" - trafić wszystkie cele; \"dobrze\" - trafić dwa cele; \"dostatecznie\" - trafić cel.",
-                        warunki: "dzień, noc.",
-                        wskazowki: "Na komendę kierownika strzelania „Naprzód" strzelający zajmuje stanowisko ogniowe w postawie klęcząc na LOO i przygotowuje się do strzelania. Po wykryciu celu prowadzi ogień do celów nr 1 i 2, po czym samodzielnie zmienia SO i prowadzi ogień do celów nr 3 i 4 w postawie leżącej."
-                    },
-                    ammo: 5
-                }
-            ],
-            combat: [
-                {
-                    id: "sb1",
-                    title: "SB dla karabinów wyborowych: SWD oraz TRG21, TRG 22 z celownikami PM1 Nr B1",
-                    details: {
-                        cele: "nr 1 - obserwator (figura bojowa nr 20) ukazuje się na 50 sekund; nr 2 - głowa (figura bojowa nr 22) ukazuje się na 60 sekund, cel ukazuje się po 20 sekundach od trafienia lub ukrycia się celu nr 1; nr 3 - popiersie (figura bojowa nr 23) ukazuje się na 1 minutę, cel ukazuje się po 10 sekundach od trafienia lub ukrycia się celu nr 2; nr 4 - biegnący (figura bojowa nr 40a), porusza się ruchem poprzecznym lub skośnym na odcinku 2 x 50 m. Cel rozpoczyna ruch po 10 sekundach od trafienia lub ukrycia się celu nr 3.",
-                        odleglosc: "nr 1 - 300-400 m; nr 2 - 300-400 m; nr 3 - 500 m; nr 4 - 400-500 m.",
-                        naboje: "7 szt.",
-                        czas: "ograniczony ukazywaniem się celów.",
-                        postawa: "leżąca z wykorzystaniem podpórki.",
-                        ocena: "\"bardzo dobrze\" - trafić wszystkie cele; \"dobrze\" - trafić trzy cele; \"dostatecznie\" - trafić dwa cele, w tym cel nr 1.",
-                        warunki: "dzień, noc."
-                    },
-                    ammo: 7
-                },
-                {
-                    id: "sb2",
-                    title: "SB nr B1 - strzelanie do wielu celów w postawie siedzącej z 40 mm granatnika MK-19",
-                    details: {
-                        cele: "nr 1 - transporter opancerzony rozpoznawczy (figura bojowa nr 49) rozmieszczony w kwadracie o boku 3 m, ukazujący się na 30 sekund; nr 2 - moździerz z obsługą (figura bojowa 34) rozmieszczony w kole o promieniu 5 m, ukazujący się na 20 sekund. Cel ukazuje się po 20 sekundach od trafienia lub ukrycia się celu nr 1; nr 3 - granatnik ciężki (figura bojowa nr 36) rozmieszczony w kole o promieniu 5 m, ukazująca się na 20 sekund. Cel ukazuje się po 20 sekundach od trafienia lub ukrycia się celu nr 2.",
-                        odleglosc: "nr 1 - 700-800 m; nr 2 - 500-600 m; nr 3 - 400-500 m.",
-                        naboje: "10 szt.",
-                        czas: "ograniczony czasem ukazywania się celów.",
-                        postawa: "siedząca.",
-                        rodzaj_ognia: "według decyzji strzelającego.",
-                        ocena: "\"bardzo dobrze\" - trafić trzy cele; \"dobrze\" - trafić cel nr 1 i 2 lub nr 3; \"dostatecznie\" - trafić cel nr 1.",
-                        warunki: "dzień, noc."
-                    },
-                    ammo: 10
-                },
-                {
-                    id: "sb3",
-                    title: "SB Nr 1 - rażenie celu nieruchomego ogniem półpośrednim z nieprzygotowanego stanowiska ogniowego z 60 mm moździerza LM - 60 D",
-                    details: {
-                        cele: "piechota (3 figury bojowe nr 30, 40 lub 40a) lub karabin maszynowy (figura bojowa nr 27) lub granatnik ciężki (figura bojowa nr 36) lub pancerzownica (figura bojowa nr 31).",
-                        odleglosc: "od minimalnej do maksymalnej",
-                        naboje: "pocisk odłamkowy; zużycie amunicji na wstrzeliwanie - 5 szt.",
-                        czas: "bdb: 10', db: 11', dst: 12'",
-                        ocena: "Zadanie ogólnej ocenia się na podstawie średniej za czas i dokładność ognia skutecznego."
-                    },
-                    ammo: 5
-                }
-            ],
-            grenade: [
-                {
-                    id: "rgr1",
-                    title: "RGR na odległość w różnych postawach",
-                    details: {
-                        cele: "biegnący (figura bojowa nr 40) ustawiony na kierunku rzutu.",
-                        odleglosc: "40 m.",
-                        granaty: "3 szkolne (zaczepne lub obronne).",
-                        postawa: "stojąca w okopie, klęcząca i leżąca.",
-                        czas: "nieograniczony.",
-                        ocena: "stojąca w okopie - bdb: 30m, db: 25m, dst: 20m; klęcząca - bdb: 25m, db: 20m, dst: 15m; leżąca - bdb: 20m, db: 15m, dst: 10m;",
-                        warunki: "dzień."
-                    },
-                    ammo: 3
-                },
-                {
-                    id: "rgr2",
-                    title: "RGR w marszu",
-                    details: {
-                        cele: "grupa piechoty - 3 x biegnący (3 x figura bojowa nr 40) - ustawiony w okopie (widoczne popiersia) wzdłuż frontu w polu o szerokości 10 m i głębokości 5 m.",
-                        odleglosc: "40 m (rzut granatem od 35 m do 25 m).",
-                        granaty: "1 szkolny/ćwiczebny.",
-                        postawa: "w marszu bez zatrzymania się.",
-                        czas: "30 s liczony od komendy \"Do ataku - Naprzód\" do komendy \"STÓJ\".",
-                        ocena: "\"wykonał\" - trafił w pole.",
-                        warunki: "dzień."
-                    },
-                    ammo: 1
-                },
-                {
-                    id: "rgr3",
-                    title: "RGR z wozu bojowego",
-                    details: {
-                        cele: "grupa piechoty - 3 x biegnący (3 x figura bojowa nr 40) - ustawiony na otwartej przestrzeni w kole o promieniu 2 m. Ponadto, wokół celu wyznacza się dodatkowo koła o promieniu 4 i 6 m.",
-                        odleglosc: "20 m.",
-                        granaty: "1 szkolny/ćwiczebny.",
-                        postawa: "z wozu bojowego (samochodu).",
-                        czas: "10 s liczony od komendy \"Granatem - ognia\" do zaryglowania włazu (ukrycia się za burtą samochodu).",
-                        ocena: "\"bardzo dobrze\" - trafić w pole o promieniu 2 m; \"dobrze\" - trafić w pole o promieniu 4 m; \"dostatecznie\" - trafić w pole o promieniu 6 m.",
-                        warunki: "dzień."
-                    },
-                    ammo: 1
-                },
-                {
-                    id: "rgr4",
-                    title: "Rzut granatem bojowym",
-                    details: {
-                        cele: "grupa piechoty - 3 x biegnący (3 x figura bojowe nr 40) - rozstawiony wzdłuż frontu na odcinku 5 m, w środkowej części pola długości 10 m i głębokości 5 m.",
-                        odleglosc: "20 m.",
-                        granaty: "1 bojowy (zaczepny lub obronny).",
-                        postawa: "stojąca w okopie.",
-                        czas: "nieograniczony.",
-                        ocena: "\"wykonał\" - gdy wybuch granatu nastąpi w polu celu.",
-                        warunki: "dzień."
-                    },
-                    ammo: 1
-                }
-            ],
-            situational: [
-                {
-                    id: "ss1",
-                    title: "SS S1 - strzelanie dynamiczne z pistoletu wojskowego",
-                    details: {
-                        cele: "popiersie (figura bojowa 23), cel stały.",
-                        odleglosc: "15 m.",
-                        naboje: "3 szt.",
-                        czas: "3 sekundy (dobycie broni i oddanie strzałów) dla broni bezkurkowej i z kaburą otwartą lub 5 sekund (dobycie broni, odbezpieczenie, odciągnięcie kurka i oddanie strzału) dla pozostałych typów pistoletów.",
-                        postawa: "stojąca z wolnej ręki lub oburącz.",
-                        rodzaj_ognia: "pojedynczy.",
-                        ocena: "\"bardzo dobrze\" - trafić cel 3 razy; \"dobrze\" - trafić cel 2 razy; \"dostatecznie\" - trafić cel.",
-                        warunki: "dzień."
-                    },
-                    ammo: 3
-                },
-                {
-                    id: "ss2",
-                    title: "SS S2 - strzelanie z pistoletu wojskowego do celów ukazujących się",
-                    details: {
-                        cele: "3 x biegnący (3 x figura bojowa nr 40) lub 3 x tarcze sportowe TS-10 rozstawione na odcinku o szerokości do 15 m, ukazujące się przemiennie w losowej kolejności pojedynczo dla pistoletów bezkurkowych na 10 sekund (dla pozostałych pistoletów na 13 sekund) z przerwą 3 sekundy.",
-                        odleglosc: "25 m.",
-                        naboje: "6 szt.",
-                        czas: "ograniczony czasem ukazywania się celów.",
-                        postawa: "stojąca z wolnej ręki lub oburącz.",
-                        rodzaj_ognia: "pojedynczy.",
-                        ocena: "\"bardzo dobrze\" - trafić 3 cele; \"dobrze\" - trafić 2 cele; \"dostatecznie\" - trafić cel.",
-                        warunki: "dzień."
-                    },
-                    ammo: 6
-                },
-                {
-                    id: "ss3",
-                    title: "SS S3 - strzelanie dynamiczne z pistoletu maszynowego",
-                    details: {
-                        cele: "klęczący (figura bojowa nr 30), cel stały.",
-                        odleglosc: "15 m.",
-                        naboje: "3 szt.",
-                        czas: "5 sekund.",
-                        postawa: "stojąca oburącz.",
-                        rodzaj_ognia: "pojedynczy.",
-                        ocena: "\"bardzo dobrze\" - trafić cel 3 razy; \"dobrze\" - trafić cel 2 razy; \"dostatecznie\" - trafić cel.",
-                        warunki: "dzień."
-                    },
-                    ammo: 3
-                },
-                {
-                    id: "ss4",
-                    title: "SS S4 - strzelanie z pistoletu maszynowego dynamiczne z dobiegiem",
-                    details: {
-                        cele: "biegnący (figura bojowa nr 40) lub tarcza sportowa TS-10, cel stały.",
-                        odleglosc: "25 m.",
-                        naboje: "8 szt. (po 4 szt. w magazynku).",
-                        czas: "1 minuta.",
-                        postawa: "stojąca i klęcząca (pistolet trzymany oburącz).",
-                        rodzaj_ognia: "według decyzji strzelającego.",
-                        ocena: "\"bardzo dobrze\" - trafić cel 6 razy; \"dobrze\" - trafić cel 4 razy; \"dostatecznie\" - trafić cel 3 razy.",
-                        warunki: "dzień."
-                    },
-                    ammo: 8
-                },
-                {
-                    id: "ss5",
-                    title: "SS S5 - strzelanie na krótkich odległościach z karabinka / pistoletu maszynowego",
-                    details: {
-                        cele: "nr 1 - popiersie (figura bojowa nr 23), ukazująca się na 15 sekund; nr 2 - klęczący (figura bojowa nr 30), ukazujący się na 15 sekund, cel ukazuje się po 5 sekundach od trafienia lub ukrycia się celu nr 1; nr 3 - popiersie z granatem (figura bojowa 23g), ukazująca się na 15 sekund, cel ukazuje się po 15 sekundach od trafienia lub ukrycia się celu nr 2; nr 4 - pancerzownica (figura bojowa nr 31), ukazująca się na 15 sekund, cel ukazuje się po 5 sekundach od trafienia lub ukrycia się celu nr 3.",
-                        odleglosc: "nr 1 i 3 - 20-40 m; nr 2 i 4 - 40-60 m.",
-                        naboje: "20 szt.",
-                        czas: "ograniczony czasem ukazywania się celów.",
-                        postawa: "nr 1 i 2 - klęcząca; nr 3 i 4 - leżąca.",
-                        rodzaj_ognia: "według decyzji strzelającego.",
-                        ocena: "\"bardzo dobrze\" - trafić wszystkie cele; \"dobrze\" - trafić dwa cele; \"dostatecznie\" - trafić cel.",
-                        warunki: "dzień, noc."
-                        wskazówki: "na komendę kierownika strzelania „Naprzód” strzelający zajmuje stanowisko ogniowe w postawie klęcząc na LOO i przygotowuje się do strzelania. Po wykryciu celu prowadzi ogień do celów nr 1 i 2, po czym samodzielnie zmienia SO i prowadzi ogień do celów nr 3 i 4 w postawie leżącej."
-                    },
-                    ammo: 20
-                }
-            ]
-        };
-
-        // Definicje dla kalkulatora amunicji
-        const exercisesAmmo = {
-            cp: [
-                { id: "cp1", title: "ĆP z karabinka do pełnienia służby wartowniczej", ammo: 6 },
-                { id: "cp2", title: "ĆP z karabinka Mini Beryl do pełnienia służby wartowniczej", ammo: 6 },
-                { id: "cp3", title: "ĆP z pistoletu maszynowego do pełnienia służby wartowniczej", ammo: 5 }
-            ],
-            ss: [
-                { id: "ss1", title: "SSz Nr 1 Tor - strzelanie na celność i skupienie", ammo: 40 },
-                { id: "ss2", title: "SSz Nr 1 z karabinu wyborowego SWD - strzelanie na celność", ammo: 6 },
-                { id: "ss3", title: "SSz Nr 1 - strzelanie w postawie siedzącej z 40 mm granatnika MK-19", ammo: 6 },
-                { id: "ss4", title: "SSz Nr 2 - strzelanie w postawie siedzącej z 40 mm granatnika MK-19", ammo: 6 },
-                { id: "ss5", title: "SSz Nr 1 - rażenie celu nieruchomego ogniem półpośrednim z przygotowanego stanowiska ogniowego 60 mm moździerza LM - 60 D", ammo: 5 },
-                { id: "ss1", title: "SS S1 - strzelanie dynamiczne z pistoletu wojskowego", ammo: 3 },
-                { id: "ss2", title: "SS S2 - strzelanie z pistoletu wojskowego do celów ukazujących się", ammo: 6 },
-                { id: "ss3", title: "SS S3 - strzelanie dynamiczne z pistoletu maszynowego", ammo: 3 },
-                { id: "ss4", title: "SS S4 - strzelanie z pistoletu maszynowego dynamiczne z dobiegiem", ammo: 8 },
-                { id: "ss5", title: "SS S5 - strzelanie na krótkich odległościach z karabinka / pistoletu maszynowego", ammo: 20 }
-            ],
-            sb: [
-                { id: "sb1", title: "SB dla karabinów wyborowych: SWD oraz TRG21", ammo: 7 },
-                { id: "sb2", title: "SB nr B1 - strzelanie do wielu celów w postawie siedzącej z 40 mm granatnika MK-19", ammo: 10 },
-                { id: "sb3", title: "SB Nr 1 - rażenie celu nieruchomego ogniem półpośrednim z nieprzygotowanego stanowiska ogniowego z 60 mm moździerza LM - 60 D", ammo: 5 }
-            ],
-            rgr: [
-                { id: "rgr1", title: "RGR na odległość w różnych postawach", ammo: 3 },
-                { id: "rgr2", title: "RGR w marszu", ammo: 1 },
-                { id: "rgr3", title: "RGR z wozu bojowego", ammo: 1 },
-                { id: "rgr4", title: "Rzut granatem bojowym", ammo: 1 }
-            ]
-        };
-
-        // Funkcja przełączania zakładek
-        function switchTab(tabId, menuItem) {
-            // Ukrycie wszystkich sekcji
-            const sections = document.getElementsByClassName('tab-section');
-            for (let i = 0; i < sections.length; i++) {
-                sections[i].classList.remove('active');
-            }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation
+            const sections = document.querySelectorAll('.section');
+            const navButtons = document.querySelectorAll('.nav-button');
             
-            // Pokazanie wybranej sekcji
-            document.getElementById(tabId).classList.add('active');
-            
-            // Aktualizacja menu
-            const menuItems = document.getElementsByClassName('menu-item');
-            for (let i = 0; i < menuItems.length; i++) {
-                menuItems[i].classList.remove('active');
-            }
-            
-            // Dodanie aktywnej klasy do klikniętego elementu
-            menuItem.classList.add('active');
-        }
-
-        // Funkcja do obliczenia wyników
-        function calculateResults() {
-            const shooters = parseInt(document.getElementById('shooters').value) || 0;
-            const veryGood = parseInt(document.getElementById('very-good').value) || 0;
-            const good = parseInt(document.getElementById('good').value) || 0;
-            const satisfactory = parseInt(document.getElementById('satisfactory').value) || 0;
-            const unsatisfactory = parseInt(document.getElementById('unsatisfactory').value) || 0;
-            
-            // Sprawdzenie poprawności danych
-            const totalResults = veryGood + good + satisfactory + unsatisfactory;
-            if (totalResults > shooters) {
-                alert("Liczba wyników nie może przekraczać liczby strzelających!");
-                return;
-            }
-            
-            // Obliczenie procentu wykonania
-            const successCount = veryGood + good + satisfactory;
-            const percentage = shooters > 0 ? (successCount / shooters * 100).toFixed(2) : 0;
-            
-            // Obliczenie średniej arytmetycznej
-            // Bardzo dobry (5), dobry (4), dostateczny (3), niedostateczny (2)
-            const totalScore = veryGood * 5 + good * 4 + satisfactory * 3 + unsatisfactory * 2;
-            const average = totalResults > 0 ? (totalScore / totalResults).toFixed(2) : 0;
-            
-            // Określenie oceny ogólnej
-            let overallRating = "Niedostateczna";
-            if (average >= 4.51) {
-                overallRating = "Bardzo dobra";
-            } else if (average >= 3.51) {
-                overallRating = "Dobra";
-            } else if (average >= 2.51) {
-                overallRating = "Dostateczna";
-            }
-            
-            // Wyświetlenie wyników
-            document.getElementById('result-shooters').textContent = shooters;
-            document.getElementById('result-very-good').textContent = veryGood;
-            document.getElementById('result-good').textContent = good;
-            document.getElementById('result-satisfactory').textContent = satisfactory;
-            document.getElementById('result-unsatisfactory').textContent = unsatisfactory;
-            document.getElementById('result-percentage').textContent = percentage + "%";
-            document.getElementById('result-average').textContent = average;
-            document.getElementById('result-overall').textContent = overallRating;
-            
-            // Przygotowanie szczegółowych obliczeń
-            const details = `
-                <h4>Szczegółowe obliczenia:</h4>
-                <p><strong>Procent wykonania:</strong> (${veryGood} + ${good} + ${satisfactory}) / ${shooters} × 100% = ${percentage}%</p>
-                <p><strong>Średnia arytmetyczna:</strong> (${veryGood} × 5 + ${good} × 4 + ${satisfactory} × 3 + ${unsatisfactory} × 2) / ${totalResults} = ${average}</p>
-                <p><strong>Ocena ogólna:</strong> 
-                    ${average >= 4.51 ? "średnia ≥ 4.51 → Bardzo dobra" : 
-                      average >= 3.51 ? "3.51 ≤ średnia < 4.51 → Dobra" : 
-                      average >= 2.51 ? "2.51 ≤ średnia < 3.51 → Dostateczna" : 
-                      "średnia < 2.51 → Niedostateczna"}
-                </p>
-            `;
-            
-            document.getElementById('details-content').innerHTML = details;
-            document.getElementById('results').style.display = 'block';
-        }
-
-        // Funkcja do obliczenia zużycia amunicji
-        function calculateAmmo(useTracer = false) {
-            const shooters = parseInt(document.getElementById('ammo-shooters').value) || 0;
-            const exerciseType = document.getElementById('exercise-type').value;
-            const specificExercise = document.getElementById('specific-exercise').value;
-            
-            if (!exerciseType || !specificExercise || shooters <= 0) {
-                alert("Wypełnij wszystkie pola!");
-                return;
-            }
-            
-            // Znalezienie konkretnego ćwiczenia
-            const exerciseList = exercisesAmmo[exerciseType];
-            const exercise = exerciseList.find(ex => ex.id === specificExercise);
-            
-            if (!exercise) {
-                alert("Nie znaleziono wybranego ćwiczenia!");
-                return;
-            }
-            
-            const ammoPerPerson = exercise.ammo;
-            const totalAmmo = ammoPerPerson * shooters;
-            
-            // Obliczenie amunicji zwykłej i smugowej
-            let regularAmmo, tracerAmmo;
-            
-            if (useTracer) {
-                // Co trzeci nabój jest smugowy (stosunek 1:3)
-                tracerAmmo = Math.floor(totalAmmo / 3);
-                regularAmmo = totalAmmo - tracerAmmo;
-            } else {
-                // Bez amunicji smugowej
-                regularAmmo = totalAmmo;
-                tracerAmmo = 0;
-            }
-            
-            // Wyświetlenie wyników
-            document.getElementById('ammo-result-shooters').textContent = shooters;
-            document.getElementById('ammo-result-exercise').textContent = exercise.title;
-            document.getElementById('ammo-per-person').textContent = ammoPerPerson;
-            document.getElementById('ammo-total').textContent = totalAmmo;
-            document.getElementById('ammo-regular').textContent = regularAmmo;
-            document.getElementById('ammo-tracer').textContent = tracerAmmo;
-            
-            // Wyświetlanie wzorca rozmieszczenia amunicji
-            const patternContainer = document.getElementById('tracer-pattern-container');
-            const patternDiv = document.getElementById('ammo-pattern');
-            
-            if (useTracer && tracerAmmo > 0) {
-                // Czyszczenie istniejącego wzorca
-                patternDiv.innerHTML = '';
-                
-                // Tworzenie wizualizacji wzorca (maksymalnie 18 naboi dla czytelności)
-                const maxDisplay = Math.min(ammoPerPerson, 18);
-                for (let i = 1; i <= maxDisplay; i++) {
-                    const ammoElement = document.createElement('div');
-                    ammoElement.className = 'ammo-round';
+            navButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
                     
-                    if (i % 3 === 0) {
-                        // Smugowy (co trzeci)
-                        ammoElement.classList.add('tracer-ammo');
-                        ammoElement.innerHTML = i + '<br>S';
-                    } else {
-                        // Zwykły
-                        ammoElement.classList.add('regular-ammo');
-                        ammoElement.innerHTML = i + '<br>Z';
+                    // Hide all sections
+                    sections.forEach(section => {
+                        section.classList.add('hidden');
+                    });
+                    
+                    // Remove active class from all buttons
+                    navButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Show selected section
+                    const sectionId = this.getAttribute('data-section');
+                    document.getElementById(sectionId).classList.remove('hidden');
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                });
+            });
+            
+            // Results calculator
+            const calculateBtn = document.getElementById('calculate-btn');
+            const resultsOutput = document.getElementById('results-output');
+            const detailsBtn = document.getElementById('details-btn');
+            const calculationDetails = document.getElementById('calculation-details');
+            
+            calculateBtn.addEventListener('click', function() {
+                const totalShooters = parseInt(document.getElementById('total-shooters').value) || 0;
+                const veryGood = parseInt(document.getElementById('very-good').value) || 0;
+                const good = parseInt(document.getElementById('good').value) || 0;
+                const satisfactory = parseInt(document.getElementById('satisfactory').value) || 0;
+                const fail = parseInt(document.getElementById('fail').value) || 0;
+                
+                // Validation
+                const sum = veryGood + good + satisfactory + fail;
+                if (sum !== totalShooters) {
+                    alert('Suma ocen musi być równa liczbie strzelających!');
+                    return;
+                }
+                
+                // Calculate results
+                const successCount = veryGood + good + satisfactory;
+                const successPercentage = (successCount / totalShooters * 100).toFixed(2);
+                
+                // Calculate average grade
+                // Very good = 5, Good = 4, Satisfactory = 3, Fail = 2
+                const weightedSum = (veryGood * 5) + (good * 4) + (satisfactory * 3) + (fail * 2);
+                const average = (weightedSum / totalShooters).toFixed(2);
+                
+                // Determine overall grade
+                let overallGrade = '';
+                let overallClass = '';
+                if (average >= 4.51) {
+                    overallGrade = 'Bardzo dobra';
+                    overallClass = 'grade-very-good';
+                } else if (average >= 3.51) {
+                    overallGrade = 'Dobra';
+                    overallClass = 'grade-good';
+                } else if (average >= 2.51) {
+                    overallGrade = 'Dostateczna';
+                    overallClass = 'grade-satisfactory';
+                } else {
+                    overallGrade = 'Niedostateczna';
+                    overallClass = 'grade-fail';
+                }
+                
+                // Update results
+                document.getElementById('total-result').textContent = totalShooters;
+                document.getElementById('very-good-result').textContent = veryGood;
+                document.getElementById('good-result').textContent = good;
+                document.getElementById('satisfactory-result').textContent = satisfactory;
+                document.getElementById('fail-result').textContent = fail;
+                document.getElementById('percentage-result').textContent = successPercentage + '%';
+                document.getElementById('average-result').textContent = average;
+                
+                const overallResultElement = document.getElementById('overall-result');
+                overallResultElement.textContent = overallGrade;
+                overallResultElement.className = overallClass;
+                
+                // Update detailed calculations
+                const detailedCalc = document.getElementById('detailed-calculations');
+                detailedCalc.innerHTML = `
+                    <p>Obliczenia:</p>
+                    <p>Oceny bardzo dobre: ${veryGood} × 5 = ${veryGood * 5}</p>
+                    <p>Oceny dobre: ${good} × 4 = ${good * 4}</p>
+                    <p>Oceny dostateczne: ${satisfactory} × 3 = ${satisfactory * 3}</p>
+                    <p>Oceny niedostateczne: ${fail} × 2 = ${fail * 2}</p>
+                    <p>Suma punktów: ${weightedSum}</p>
+                    <p>Średnia: ${weightedSum} ÷ ${totalShooters} = ${average}</p>
+                    <p>Ocena ogólna: ${overallGrade} (średnia ${average})</p>
+                `;
+                
+                // Show results
+                resultsOutput.classList.remove('hidden');
+            });
+            
+            detailsBtn.addEventListener('click', function() {
+                calculationDetails.classList.toggle('hidden');
+                this.textContent = calculationDetails.classList.contains('hidden') ? 'Pokaż szczegóły' : 'Ukryj szczegóły';
+            });
+            
+            // Ammo calculator
+            const calculateAmmoBtn = document.getElementById('calculate-ammo-btn');
+            const ammoResults = document.getElementById('ammo-results');
+            const ammoBreakdown = document.getElementById('ammo-breakdown');
+            
+            // Ammo type selection buttons
+            const regularAmmoBtn = document.getElementById('regular-ammo-btn');
+            const tracerAmmoBtn = document.getElementById('tracer-ammo-btn');
+            
+            regularAmmoBtn.addEventListener('click', function() {
+                regularAmmoBtn.classList.add('active');
+                tracerAmmoBtn.classList.remove('active');
+            });
+            
+            tracerAmmoBtn.addEventListener('click', function() {
+                tracerAmmoBtn.classList.add('active');
+                regularAmmoBtn.classList.remove('active');
+            });
+            
+            const ammoPrices = {
+                '9x18': 1.38,
+                '9x19': 1.15,
+                '5.56': 2.50,
+                '7.62': 3.45
+            };
+            
+            const ammoNames = {
+                '9x18': '9×18 mm Makarowa',
+                '9x19': '9×19 mm Parabellum',
+                '5.56': '5,56×45 mm NATO',
+                '7.62': '7.62×51 mm NATO'
+            };
+            
+            calculateAmmoBtn.addEventListener('click', function() {
+                const ammoType = document.getElementById('ammo-type').value;
+                const shootersCount = parseInt(document.getElementById('shooters-count').value) || 0;
+                const shotsPerShooter = parseInt(document.getElementById('shots-per-shooter').value) || 0;
+                const useTracerAmmo = document.getElementById('tracer-ammo-btn').classList.contains('active');
+                
+                if (shootersCount <= 0 || shotsPerShooter <= 0) {
+                    alert('Proszę wprowadzić poprawne wartości!');
+                    return;
+                }
+                
+                const totalAmmo = shootersCount * shotsPerShooter;
+                let regularAmmo = totalAmmo;
+                let tracerAmmo = 0;
+                
+                if (useTracerAmmo) {
+                    // Calculate in 3:1 ratio (regular:tracer)
+                    regularAmmo = Math.ceil(totalAmmo * 0.75);
+                    tracerAmmo = Math.floor(totalAmmo * 0.25);
+                    
+                    // Adjust if necessary to make the total correct
+                    if (regularAmmo + tracerAmmo !== totalAmmo) {
+                        regularAmmo = totalAmmo - tracerAmmo;
                     }
                     
-                    patternDiv.appendChild(ammoElement);
-                }
-                
-                // Pokazanie wzorca
-                patternContainer.style.display = 'flex';
-            } else {
-                // Ukrycie wzorca jeśli nie używamy amunicji smugowej
-                patternContainer.style.display = 'none';
-            }
-            
-            document.getElementById('ammo-results').style.display = 'block';
-        }
-
-        // Aktualizacja listy ćwiczeń po wyborze kategorii
-        function updateExercises() {
-            const category = document.getElementById('shooting-category').value;
-            const exerciseSelect = document.getElementById('exercise-select');
-            
-            // Wyczyszczenie listy
-            exerciseSelect.innerHTML = '';
-            exerciseSelect.disabled = true;
-            
-            if (!category) {
-                exerciseSelect.innerHTML = '<option value="">Najpierw wybierz kategorię</option>';
-                return;
-            }
-            
-            // Dodanie opcji "Wybierz ćwiczenie"
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = 'Wybierz ćwiczenie';
-            exerciseSelect.appendChild(defaultOption);
-            
-            // Dodanie ćwiczeń z wybranej kategorii
-            const exercises = exercisesData[category];
-            if (exercises && exercises.length > 0) {
-                exercises.forEach(exercise => {
-                    const option = document.createElement('option');
-                    option.value = exercise.id;
-                    option.textContent = exercise.title;
-                    exerciseSelect.appendChild(option);
-                });
-                
-                exerciseSelect.disabled = false;
-            } else {
-                exerciseSelect.innerHTML = '<option value="">Brak ćwiczeń w tej kategorii</option>';
-            }
-            
-            // Ukrycie szczegółów ćwiczenia
-            document.getElementById('exercise-details').style.display = 'none';
-        }
-
-        // Wyświetlenie szczegółów ćwiczenia
-        function showExerciseDetails() {
-            const category = document.getElementById('shooting-category').value;
-            const exerciseId = document.getElementById('exercise-select').value;
-            
-            if (!category || !exerciseId) {
-                document.getElementById('exercise-details').style.display = 'none';
-                return;
-            }
-            
-            // Znalezienie ćwiczenia
-            const exercises = exercisesData[category];
-            const exercise = exercises.find(ex => ex.id === exerciseId);
-            
-            if (!exercise) {
-                document.getElementById('exercise-details').style.display = 'none';
-                return;
-            }
-            
-            // Przygotowanie zawartości
-            document.getElementById('exercise-title').innerHTML = '<i class="fas fa-info-circle" style="color: #2196f3; margin-right: 10px;"></i>' + exercise.title;
-            
-            let content = '';
-            const details = exercise.details;
-            
-            // Dodanie wszystkich dostępnych szczegółów z ikonami
-            if (details.cele) content += `<div class="result-item"><span class="result-label"><i class="fas fa-bullseye" style="color: #f44336;"></i> Cele:</span><span>${details.cele}</span></div>`;
-            if (details.odleglosc) content += `<div class="result-item"><span class="result-label"><i class="fas fa-ruler-horizontal" style="color: #4caf50;"></i> Odległość:</span><span>${details.odleglosc}</span></div>`;
-            if (details.naboje) content += `<div class="result-item"><span class="result-label"><i class="fas fa-boxes" style="color: #ff9800;"></i> Liczba nabojów:</span><span>${details.naboje}</span></div>`;
-            if (details.granaty) content += `<div class="result-item"><span class="result-label"><i class="fas fa-bomb" style="color: #9c27b0;"></i> Liczba granatów:</span><span>${details.granaty}</span></div>`;
-            if (details.czas) content += `<div class="result-item"><span class="result-label"><i class="fas fa-clock" style="color: #2196f3;"></i> Czas:</span><span>${details.czas}</span></div>`;
-            if (details.postawa) content += `<div class="result-item"><span class="result-label"><i class="fas fa-user" style="color: #e91e63;"></i> Postawa:</span><span>${details.postawa}</span></div>`;
-            if (details.rodzaj_ognia) content += `<div class="result-item"><span class="result-label"><i class="fas fa-fire" style="color: #f44336;"></i> Rodzaj ognia:</span><span>${details.rodzaj_ognia}</span></div>`;
-            if (details.ocena) content += `<div class="result-item"><span class="result-label"><i class="fas fa-star" style="color: #ffeb3b;"></i> Ocena:</span><span>${details.ocena}</span></div>`;
-            if (details.warunki) content += `<div class="result-item"><span class="result-label"><i class="fas fa-cloud-sun" style="color: #03a9f4;"></i> Warunki strzelania:</span><span>${details.warunki}</span></div>`;
-            
-            document.getElementById('exercise-content').innerHTML = content;
-            document.getElementById('exercise-details').style.display = 'block';
-        }
-
-        // Aktualizacja konkretnych ćwiczeń po wyborze rodzaju strzelania
-        document.getElementById('exercise-type').addEventListener('change', function() {
-            const exerciseType = this.value;
-            const specificExerciseSelect = document.getElementById('specific-exercise');
-            
-            // Wyczyszczenie listy
-            specificExerciseSelect.innerHTML = '';
-            specificExerciseSelect.disabled = true;
-            
-            if (!exerciseType) {
-                specificExerciseSelect.innerHTML = '<option value="">Najpierw wybierz rodzaj strzelania</option>';
-                return;
-            }
-            
-            // Dodanie opcji "Wybierz ćwiczenie"
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = 'Wybierz ćwiczenie';
-            specificExerciseSelect.appendChild(defaultOption);
-            
-            // Dodanie ćwiczeń z wybranego rodzaju
-            const exercises = exercisesAmmo[exerciseType];
-            if (exercises && exercises.length > 0) {
-                exercises.forEach(exercise => {
-                    const option = document.createElement('option');
-                    option.value = exercise.id;
-                    option.textContent = exercise.title;
-                    specificExerciseSelect.appendChild(option);
-                });
-                
-                specificExerciseSelect.disabled = false;
-            } else {
-                specificExerciseSelect.innerHTML = '<option value="">Brak ćwiczeń w tej kategorii</option>';
-            }
-        });
-
-        // Obsługa zakładek w specyfikacjach technicznych
-        function openTab(evt, tabName) {
-            // Ukrycie wszystkich zakładek
-            const tabContents = document.getElementsByClassName("tab-content");
-            for (let i = 0; i < tabContents.length; i++) {
-                tabContents[i].classList.remove("active");
-            }
-            
-            // Usunięcie aktywnej klasy z przycisków zakładek
-            const tabButtons = document.getElementsByClassName("tab-button");
-            for (let i = 0; i < tabButtons.length; i++) {
-                tabButtons[i].classList.remove("active");
-            }
-            
-            // Pokazanie wybranej zakładki i uaktywnienie przycisku
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
-        }
-
-        // Obsługa elementów zwijanych
-        const collapsibles = document.getElementsByClassName("collapsible");
-        for (let i = 0; i < collapsibles.length; i++) {
-            collapsibles[i].addEventListener("click", function() {
-                this.classList.toggle("active");
-                const content = this.nextElementSibling;
-                if (content.style.maxHeight) {
-                    content.style.maxHeight = null;
+                    ammoBreakdown.classList.remove('hidden');
                 } else {
-                    content.style.maxHeight = content.scrollHeight + "px";
+                    ammoBreakdown.classList.add('hidden');
                 }
+                
+                const ammoPrice = ammoPrices[ammoType];
+                const totalCost = (totalAmmo * ammoPrice).toFixed(2);
+                
+                // Update results
+                document.getElementById('ammo-type-result').textContent = ammoNames[ammoType];
+                document.getElementById('shooters-result').textContent = shootersCount;
+                document.getElementById('ammo-per-person-result').textContent = shotsPerShooter + ' szt.';
+                document.getElementById('total-ammo-result').textContent = totalAmmo + ' szt.';
+                document.getElementById('regular-ammo-result').textContent = regularAmmo + ' szt.';
+                document.getElementById('tracer-ammo-result').textContent = tracerAmmo + ' szt.';
+                document.getElementById('total-cost-result').textContent = totalCost + ' zł';
+                
+                // Show results
+                ammoResults.classList.remove('hidden');
             });
-        }
+            
+            
+            // Collimator tabs
+            const weatherTabBtn = document.getElementById('weather-tab-btn');
+            const collimatorTabBtn = document.getElementById('collimator-tab-btn');
+            const weatherConditions = document.getElementById('weather-conditions');
+            const collimatorSettings = document.getElementById('collimator-settings');
+            
+            weatherTabBtn.addEventListener('click', function() {
+                weatherTabBtn.classList.add('active');
+                collimatorTabBtn.classList.remove('active');
+                weatherConditions.classList.remove('hidden');
+                collimatorSettings.classList.add('hidden');
+            });
+            
+            collimatorTabBtn.addEventListener('click', function() {
+                collimatorTabBtn.classList.add('active');
+                weatherTabBtn.classList.remove('active');
+                collimatorSettings.classList.remove('hidden');
+                weatherConditions.classList.add('hidden');
+            });
+            
+            // Collimator calculator
+            const calculateAdjustmentBtn = document.getElementById('calculate-adjustment-btn');
+            const adjustmentResults = document.getElementById('adjustment-results');
+            
+            calculateAdjustmentBtn.addEventListener('click', function() {
+                const distance = parseInt(document.getElementById('distance').value) || 100;
+                const currentX = parseFloat(document.getElementById('current-x').value) || 0;
+                const currentY = parseFloat(document.getElementById('current-y').value) || 0;
+                const clicksPerMOA = parseInt(document.getElementById('clicks-per-moa').value) || 4;
+                
+                // Calculate MOA adjustment
+                // 1 MOA ≈ 2.908 cm at 100 meters
+                // Scale for distance: MOA = (deviation in cm * 100) / (2.908 * distance in meters)
+                const moaPerCmAt100m = 1 / 2.908;
+                
+                // Convert to MOA based on distance
+                const horizontalMOA = currentX * moaPerCmAt100m * (100 / distance);
+                const verticalMOA = currentY * moaPerCmAt100m * (100 / distance);
+                
+                // Convert MOA to clicks
+                const horizontalClicks = Math.round(horizontalMOA * clicksPerMOA);
+                const verticalClicks = Math.round(verticalMOA * clicksPerMOA);
+                
+                // Update results
+                document.getElementById('horizontal-clicks').textContent = 
+                    Math.abs(horizontalClicks) + ' kliknięć ' + 
+                    (horizontalClicks > 0 ? 'w lewo' : horizontalClicks < 0 ? 'w prawo' : '');
+                
+                document.getElementById('vertical-clicks').textContent = 
+                    Math.abs(verticalClicks) + ' kliknięć ' + 
+                    (verticalClicks > 0 ? 'w dół' : verticalClicks < 0 ? 'w górę' : '');
+                
+                // Generate instruction
+                let instruction = 'Aby skorygować punkt trafienia:';
+                if (horizontalClicks !== 0) {
+                    instruction += ' Obróć pokrętło poziome ' + 
+                        Math.abs(horizontalClicks) + ' kliknięć ' + 
+                        (horizontalClicks > 0 ? 'w lewo' : 'w prawo') + '.';
+                }
+                if (verticalClicks !== 0) {
+                    instruction += ' Obróć pokrętło pionowe ' + 
+                        Math.abs(verticalClicks) + ' kliknięć ' + 
+                        (verticalClicks > 0 ? 'w dół' : 'w górę') + '.';
+                }
+                
+                document.getElementById('adjustment-instruction').textContent = instruction;
+                
+                // Show results
+                adjustmentResults.classList.remove('hidden');
+            });
+        });
     </script>
 </body>
 </html>
